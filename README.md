@@ -51,14 +51,14 @@
 12. JUnit으로 모델 테스트 수행
 13. 윷놀이판 커스터마이징 가능 (오각형, 육각형)
 
-### Member
+### Member (GitHub ID)
 
-21 고성현
+21 고성현 (koseongboy)
 
-21 김재일
+21 김재일 (gamok555)
 
-21 류형석
+21 류형석 (rhyungseok)
 
-23 신지호
+23 신지호 (jihojoe)
 
-21 이동규
+21 이동규 (fishinSausage)
