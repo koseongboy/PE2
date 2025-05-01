@@ -2,12 +2,13 @@ package view;
 
 public interface view {
 
-	 public void gamesetup(int map, int player, int token){
+	  //게임 시작 및 맵, 플레이어, 말 수 반환 type int[map, player, piece] map은 4 5 6 (사각형, 오각형, 육각형)
+	  public int[] gamesetup(){
 		    
 	  }
 
-	  //말이동으로 어떤말이 어떻게 움직였는지만 받아오면 가능
-	  public void mapupdate(){
+	  //piece(0~4)가 map_index 에 도착(만약 먹혔으면 -1, 도착했으면 100)
+	  public void mapupdate(int piece, int map_index){
 	    
 	  }
 
@@ -21,7 +22,7 @@ public interface view {
 	    
 	  }
 
-	  // return chosen horse number    start from 1
+	  // return chosen horse number    start from 0
 	  public int choice_horse(){
 	    
 	  }
@@ -30,4 +31,9 @@ public interface view {
 	  public int end(){
 	    
 	  }
+	  //player 0~3
+	  public void turnchange(int turn) {
+		  
+	  }
+	  
 }
