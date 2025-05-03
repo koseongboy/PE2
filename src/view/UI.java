@@ -10,8 +10,8 @@ import java.util.Random;
 public class UI implements view{
 	
 	JFrame frame;		//메인 프레임
-	JPanel throwing;	//윷 던지기 패널 
-	JPanel yut_state;	//윷 던진 결과 저장 패널
+	JPanel throwing;	//윷 던지기 패널
+	JPanel yut_state;	//윷 던진 결과 패널
 	
 	JPanel[] player;	//플레이어 패널 저장 배열
 	JLabel[] turn_label;//플레이어 패널 영역에 있는 "your turn" 라벨 배열
@@ -108,18 +108,29 @@ public class UI implements view{
         switch(map_type) {
         case 4:
         	boardImg = new ImageIcon(UI.class.getResource("/images/사각형_윷놀이판.jpg")).getImage();
-        	map_node=new CirclePanel[29];
         	break;
         case 5:
+        	//오각형 맵의 경우 노드 위치 재설정
         	boardImg = new ImageIcon(UI.class.getResource("/images/오각형_윷놀이판.png")).getImage();
+        	int[][] new_location= {{642,743,92},{693, 684, 52},{718, 608, 52},{743, 531, 52},{768, 456, 52},
+        						   {767,336,92},{719,290,52},{656,241,52},{591,192,52},{528,142,52},
+        						   {419,71,92},{351,142,52},{286,191,52},{222,240,52},{159,289,52},
+        						   {70,338,92},{109,456,52},{134,530,52},{159,606,52},{183,683,52},
+        						   {197,743,92},{335,765,52},{404,765,52},{473,765,52},{543,766,52},
+        						   {575,641,52},{522,569,52},{398,405,135},{681,387,52},{593,409,52},
+        						   {438,206,52},{438,301,52},{197,386,52},{283,410,52},{302,641,52},{354,569,52}};
+        	node_location=new_location;
+        	map_len=36;
         	break;
         case 6:
         }
         
+        map_node=new CirclePanel[map_len];
         //맵의 각 노드에 패널 설정
         for(int i=0;i<map_len;i++) {
         	map_node[i]=new CirclePanel(node_location[i][2]);
         	map_node[i].setBounds(node_location[i][0],node_location[i][1], node_location[i][2],node_location[i][2]);
+        	map_node[i].setLayout(new GridBagLayout());
         	map_node[i].setOpaque(false);
 		  	map.add(map_node[i]);
         	
@@ -181,12 +192,16 @@ public class UI implements view{
 		frame.getContentPane().add(throwing);
 		throwing.setLayout(null);
 		
-		//윷 상태 패널 초기화
+		
+		
+		//윷 상태 패널 초기화	
 		yut_state = new JPanel();
 		yut_state.setBackground(new Color(46, 139, 87));
 		yut_state.setBounds(1200, 516, 424, 372);
 		frame.getContentPane().add(yut_state);
 		yut_state.setLayout(null);
+		
+		
 		
 		frame.setVisible(true);
 		
