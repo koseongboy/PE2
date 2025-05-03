@@ -23,5 +23,16 @@ public class Horse {
 		return count;
 	}
 
+	public void setCount(int value) {
+		this.count = value;
+	}
+	
+	public void setStatus(int status) {
+		this.status = status;
+	}
+	
+	public void setLocation(int location) {
+		this.location = location;
+	}
 	
 }
