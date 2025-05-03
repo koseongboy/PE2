@@ -9,7 +9,7 @@ public class User implements User_Interface {
 	public User(int num_of_horses) {
 		for (int i = 0; i < num_of_horses; i++) {
 			Horse horse = new Horse();
-			this.horses.add(horse)
+			this.horses.add(horse);
 		}
 	}
 	@Override
