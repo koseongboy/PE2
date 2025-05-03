@@ -44,6 +44,8 @@ public class User implements User_Interface {
 					for(Horse h : horses) {
 						if(h.getStatus() == Horse.OVERLAPPED) {
 							h.setStatus(Horse.WAITING);
+							h.setCount(1);
+							h.setLocation(-1);
 							currentCount = to.getCount();
 							to.setCount(currentCount - 1);
 							if(to.getCount() == 1) break;
@@ -56,6 +58,25 @@ public class User implements User_Interface {
 		} catch(Exception e) {
 			System.out.println("위치가 다른 말을 잡으려 함");
 		}
+	}
+	public boolean checkHorseArrived(Horse horse) {		
+		if(horse.getLocation() == -2) {
+			horse.setStatus(Horse.ARRIVED);
+			if (horse.getCount() > 1) {
+				int currentCount;
+				for(Horse h : horses) {
+					if(h.getStatus() == Horse.OVERLAPPED) {
+						h.setStatus(Horse.ARRIVED);
+						h.setCount(1);
+						h.setLocation(-2);
+						currentCount = horse.getCount();
+						horse.setCount(currentCount - 1);
+						if(horse.getCount() == 1) break;
+					}
+				}
+			}
+		return true;
+		} else return false;
 	}
 	
 	@Override
@@ -78,5 +99,6 @@ public class User implements User_Interface {
 		return dest;
 		
 	}
+	
 
 }
