@@ -4,22 +4,32 @@ import java.util.ArrayList;
 
 public class User implements User_Interface {
 	private ArrayList<Horse> horses;
+	private int teamIndex;
 	
-	
-	public User(int num_of_horses) {
+	public User(int num_of_horses, int team_index) {
+		this.teamIndex = team_index;
 		for (int i = 0; i < num_of_horses; i++) {
-			Horse horse = new Horse();
+			Horse horse = new Horse(team_index);
 			this.horses.add(horse);
 		}
 	}
 	@Override
 	public ArrayList<Horse> getHorses() {
-		// TODO Auto-generated method stub
-		return null;
+		return horses;
 	}
 	@Override
-		public boolean moveHorse(Horse horse, int count) {
-			// TODO Auto-generated method stub
-			return false;
+	public int moveHorse(Horse horse, int count) {
+		int startPoint;
+		if (horse.getStatus() == Horse.WAITING) {
+			startPoint = 0;
+		} else if (horse.getStatus() == Horse.ON_MAP) {
+			startPoint = horse.getLocation();
+		} else {
+			System.out.println("도착했거나 업혀있는 말을 이동시키려 하고 있음");
+			throw new RuntimeException();
 		}
+		int dest = 0; //TO-DO 0대신 계산 함수 넣어야함 
+		return dest;
+		
+	}
 }
