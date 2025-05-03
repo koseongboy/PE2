@@ -10,12 +10,6 @@ public class Horse {
 	private int location = -1;
 	private int count = 1;
 	
-	private int team_index;
-	
-	public Horse(int team_index) {
-		this.team_index = team_index;
-	}
-	
 	
 	public int getStatus() {
 		return status;
@@ -28,9 +22,6 @@ public class Horse {
 	public int getCount() {
 		return count;
 	}
-	
-	public int getTeamIndex() {
-		return team_index;
-	}
+
 	
 }

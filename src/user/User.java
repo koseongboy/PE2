@@ -4,12 +4,10 @@ import java.util.ArrayList;
 
 public class User implements User_Interface {
 	private ArrayList<Horse> horses;
-	private int teamIndex;
 	
-	public User(int num_of_horses, int team_index) {
-		this.teamIndex = team_index;
+	public User(int num_of_horses) {
 		for (int i = 0; i < num_of_horses; i++) {
-			Horse horse = new Horse(team_index);
+			Horse horse = new Horse();
 			this.horses.add(horse);
 		}
 	}
