@@ -1,4 +1,4 @@
-package team;
+package user;
 
 public class Horse {
 

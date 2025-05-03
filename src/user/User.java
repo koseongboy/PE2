@@ -1,8 +1,8 @@
-package team;
+package user;
 
 import java.util.ArrayList;
 
-public class User implements Team_Interface {
+public class User implements User_Interface {
 	private ArrayList<Horse> horses;
 	
 	
