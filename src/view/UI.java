@@ -7,9 +7,15 @@ import java.awt.event.*;       // ActionListener …
 import java.util.Random;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.*;
+
+import user.User;
+import user.Horse;
 
 
-public class UI implements view{
+public class UI implements View{
 	
 	JFrame frame;		//메인 프레임
 	JPanel throwing;	//윷 던지기 패널
@@ -130,6 +136,19 @@ public class UI implements view{
         	map_len=36;
         	break;
         case 6:
+        	//육각형 맵의 경우 노드 위치 재설정
+        	boardImg = new ImageIcon(UI.class.getResource("/images/육각형_윷놀이판.png")).getImage();
+        	int[][] map6_location= {{750,635,86},{770,570,48},{770,500,48},{770,430,48},{770,358,48},
+        							{749,253,86},{695,221,48},{640,186,48},{583,155,48},{527,123,48},
+        							{421,65,86},{363,123,48},{302,158,48},{242,193,48},{181,228,48},
+        							{94,254,86},{111,358,48},{111,429,48},{111,500,48},{111,570,48},
+        							{93,634,86},{177,690,48},{239,723,48},{300,758,48},{361,791,48},
+        							{421,808,86},{510,796,48},{573,762,48},{635,729,48},{696,696,48},
+        							{674,583,48},{577,524,48},{393,392,142},{683,311,48},{584,368,48},
+        							{441,168,48},{441,283,48},{203,315,48},{303,372,48},{202,581,48},
+        							{302,523,48},{437,712,48},{440,597,48}};
+        	node_location=map6_location;
+        	map_len=43;
         }
         
         map_node=new CirclePanel[map_len];
@@ -241,12 +260,48 @@ public class UI implements view{
 	}
 
 	  //piece(0~4)가 map_index 에 도착(만약 먹혔으면 -1, 도착했으면 100)
-	  public void mapupdate(int piece, int map_index){
-	    
-	  }
-
-	  
-	  
+	public void mapupdate(User[] user){
+		  
+		  //플레이어 패널 안에서 각 말들의 위치(0~5번 행이 각 말들의 위치를 나타냄)
+		int[][] piece_position= {{33,30},{112,30},{191,30},
+	        						 {33,112},{112,112}};
+		
+		for(int i=0;i<user.length;i++) {
+			ArrayList<Horse> pieces=user[i].getHorses();
+			
+			for(int j=0;j<pieces.size();j++) {
+				int state=pieces.get(j).getStatus();
+				int location;
+				
+				piece[i][j].removeAll();
+				
+				switch(state) {
+				case Horse.WAITING:
+					piece[i][j].setLocation(piece_position[j][0],piece_position[j][1]);
+					player[i].add(piece[i][j]);
+					break;
+				case Horse.ON_MAP:
+					location=pieces.get(j).getLocation();
+					map_node[location].add(piece[i][j]);
+					break;
+				case Horse.OVERLAPPED:
+					location=pieces.get(j).getLocation();
+					int count=pieces.get(j).getCount();
+					JLabel group_count=new JLabel(String.valueOf(count));
+					piece[i][j].add(group_count);
+					map_node[location].removeAll();
+					map_node[location].add(piece[i][j]);
+					break;
+				case Horse.ARRIVED:
+					piece[i][j].setLocation(piece_position[j][0],piece_position[j][1]);
+					player[i].add(piece[i][j]);
+					piece[i][j].setEnabled(false);
+					JLabel complete=new JLabel("도착");
+					piece[i][j].add(complete);
+				}
+			}
+		}
+	}
 	  
 	  
 	  
