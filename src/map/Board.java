@@ -78,7 +78,7 @@ public class Board {
             end = n[41];
         }
     }
-    private static int followPath(int startindex, int steps, int style) { if(style == 4){
+    public static int followPath(int startindex, int steps, int style) { if(style == 4){
 
         if(startindex!=5 && startindex!=10 && startindex!=15){
             return startindex + steps;
@@ -651,7 +651,7 @@ public class Board {
                                                                                                                                                     return 41;
                                                                                                                                                 }
         }
-    private static int followPath(int startindex, int steps, int previousIndex, int style) {
+    public static int followPath(int startindex, int steps, int previousIndex, int style) {
         if (style == 4) {
             if (startindex == 22) {
                 return previousIndex;

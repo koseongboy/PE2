@@ -1,6 +1,7 @@
 package user;
 
 import java.util.ArrayList;
+import map.Board;
 
 
 public class User implements User_Interface {
