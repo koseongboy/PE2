@@ -5,6 +5,8 @@ import javax.swing.*;          // JFrame, JButton, JOptionPane...
 import java.awt.*;             // BorderLayout, FlowLayout …
 import java.awt.event.*;       // ActionListener …
 import java.util.Random;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 
 
 public class UI implements view{
@@ -17,6 +19,11 @@ public class UI implements view{
 	JLabel[] turn_label;//플레이어 패널 영역에 있는 "your turn" 라벨 배열
 	JPanel[][] piece;	//플레이어 수 X 말의 수 shape의 말 패널 배열
 	JPanel[] map_node;		//맵의 노드 패널 배열
+	
+	//////////////////////////////////////////////////////////////////////////////////추가
+	JPanel[] yut_state_image;//오른쪽 위의 윷 이미지
+	JLabel[] yut_state_text;//오른쪽 위 윷 텍스트
+	//////////////////////////////////////////////////////////////////////////////////추가
 	
 	private Image boardImg;		//윷 판 이미지->gamesetup 메서드에서만 사용
 	
@@ -179,6 +186,9 @@ public class UI implements view{
   		  		piece[i][j]=new CirclePanel(46);
   		  		piece[i][j].setBounds(piece_position[j][0],piece_position[j][1], 46,46);
   		  		piece[i][j].setBackground(new Color(piece_color[i][0],piece_color[i][1],piece_color[i][2]));
+  		//////////////////////////////////////////////////////////////////////////////////추가
+  		  		piece[i][j].setLayout(new BorderLayout());
+  		//////////////////////////////////////////////////////////////////////////////////추가
   		  		player[i].add(piece[i][j]);
   		  	}
         }
@@ -201,7 +211,27 @@ public class UI implements view{
 		frame.getContentPane().add(yut_state);
 		yut_state.setLayout(null);
 		
+		//////////////////////////////////////////////////////////////////////////////////추가
+		yut_state_image = new JPanel[6];
+		for(int i = 0 ; i<6 ; i++) {
+			yut_state_image[i] = new JPanel();
+		}
+		int[][] yut_state_loc = new int[][]{{32,44,72,99},{176, 44, 72, 99},{320, 44, 72, 99},{32, 207, 72, 99},{176, 207, 72, 99},{320, 207, 72, 99}};
+		for(int i = 0 ; i<6 ; i++) {
+			yut_state_image[i].setBounds(yut_state_loc[i][0],yut_state_loc[i][1],yut_state_loc[i][2],yut_state_loc[i][3]);
+			yut_state.add(yut_state_image[i]);
+		}
 		
+		yut_state_text = new JLabel[6];
+		for(int i = 0 ; i<6 ; i++) {
+			yut_state_text[i] = new JLabel("0");
+		}
+		int[][] text_loc = new int[][]{{64, 153, 57, 15},{208, 153, 57, 15},{352, 153, 57, 15},{64, 316, 57, 15},{208, 316, 57, 15},{352, 316, 57, 15}};
+		for(int i = 0 ; i<6 ; i++) {
+			yut_state_text[i].setBounds(text_loc[i][0],text_loc[i][1],text_loc[i][2],text_loc[i][3]);
+			yut_state.add(yut_state_text[i]);
+		}
+		//////////////////////////////////////////////////////////////////////////////////추가
 		
 		frame.setVisible(true);
 		
@@ -215,34 +245,218 @@ public class UI implements view{
 	    
 	  }
 
+	  
+	  
+	  
+	  
+	  
+	  
 	  //return 0 means random button click, return 1 means select button click
 	  public int throwing(){
-		  return 0;
+		 	int output;
+		  	BlockingQueue<Integer> clickQueue = new ArrayBlockingQueue<>(1);
+			JButton random_button = new JButton("random");
+			random_button.setBounds(58, 146, 122, 54);
+			random_button.addActionListener(e -> {
+                // 클릭된 버튼 인덱스를 큐에 넣음 (한 번만 가능)
+            	try {
+					clickQueue.put(0);
+				} catch (InterruptedException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+            });
+			throwing.add(random_button);
+			
+			JButton choose_button = new JButton("choose");
+			choose_button.setBounds(242, 146, 122, 54);
+			choose_button.addActionListener(e -> {
+                // 클릭된 버튼 인덱스를 큐에 넣음 (한 번만 가능)
+            	try {
+					clickQueue.put(1);
+				} catch (InterruptedException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+            });
+			throwing.add(choose_button);
+			throwing.revalidate();
+			throwing.repaint();
+			
+			 try {
+		        	output = clickQueue.take();
+		        	throwing.removeAll();
+		        	throwing.revalidate();
+		        	throwing.repaint();
+		            // 버튼 클릭까지 대기
+		            return output;
+		        } catch (InterruptedException e) {
+		            Thread.currentThread().interrupt();
+		            return -1; // 예외 발생 시 -1 반환
+		        }
 	  }
 
 	  //return 0~5 빽도 도 개 걸 윷 모
 	  public int choice_yut(){
-		  return 0;
+		  	int output;
+		  	BlockingQueue<Integer> clickQueue = new ArrayBlockingQueue<>(1);
+			JLabel choiceone = new JLabel("CHOOSE ONE");
+
+			
+			choiceone.setFont(new Font("굴림", Font.BOLD, 29));
+			choiceone.setBounds(108, 0, 220, 34);
+			throwing.add(choiceone);
+			
+			JButton button_arr[] = new JButton[6];
+			for(int i = 0 ; i<6 ; i++) {
+				button_arr[i] = new JButton("1");
+			}
+			
+			int [][] button_loc = {{32,44,72,99},{176, 44, 72, 99},{320, 44, 72, 99},{32, 207, 72, 99},{176, 207, 72, 99},{320, 207, 72, 99}};
+			for(int i = 0 ; i<6 ; i++) {
+				final int index = i;
+				button_arr[i].setBounds(button_loc[i][0],button_loc[i][1],button_loc[i][2],button_loc[i][3]);
+				button_arr[i].addActionListener(e -> {
+	                // 클릭된 버튼 인덱스를 큐에 넣음 (한 번만 가능)
+	            	try {
+						clickQueue.put(index);
+					} catch (InterruptedException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+	            });
+				throwing.add(button_arr[i]);
+			}
+
+			
+			throwing.revalidate();
+			throwing.repaint();
+
+			 try {
+		        	output = clickQueue.take();
+		        	throwing.removeAll();
+		        	throwing.revalidate();
+		        	throwing.repaint();
+		            // 버튼 클릭까지 대기
+		            return output;
+		        } catch (InterruptedException e) {
+		            Thread.currentThread().interrupt();
+		            return -1; // 예외 발생 시 -1 반환
+		        }
 	  }
 
 	  // return chosen horse number    start from 0
-	  public int choice_horse(){
-		  return 0;
+	  public int choice_horse(int turn){
+		  JButton horse_button[] = new JButton[piece[0].length];
+		  int output;
+		  BlockingQueue<Integer> clickQueue = new ArrayBlockingQueue<>(1);
+		  for(int i = 0 ;i<piece[0].length; i++) {
+			  final int index = i;
+			  horse_button[i] = new JButton(Integer.toString(i)+"번");
+			  horse_button[i].addActionListener(e -> {
+	                // 클릭된 버튼 인덱스를 큐에 넣음 (한 번만 가능)
+	            	try {
+						clickQueue.put(index);
+					} catch (InterruptedException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+	            });
+			  piece[turn][i].add(horse_button[i], BorderLayout.CENTER);
+			  piece[turn][i].revalidate();
+			  piece[turn][i].repaint();
+			  
+		  }
+		  
+			 try {
+		        	output = clickQueue.take();
+		        	for(int i = 0 ;i<piece[0].length; i++) {
+		        		piece[turn][i].removeAll();
+		        		piece[turn][i].revalidate();
+		        		piece[turn][i].repaint();
+		        	}
+
+		            // 버튼 클릭까지 대기
+		            return output;
+		        } catch (InterruptedException e) {
+		            Thread.currentThread().interrupt();
+		            return -1; // 예외 발생 시 -1 반환
+		        }
 	  }
 
 	  // if restart button pressed return 1; end button return 0
-	  public int end(){
-		  return 0;
+	  public int end(int winner){
+		  frame.getContentPane().removeAll();
+		  int output;
+		  BlockingQueue<Integer> clickQueue = new ArrayBlockingQueue<>(1);
+		  	
+		  JPanel panel = new JPanel();
+		  panel.setBounds(25, 10, 1587, 923);
+		  frame.getContentPane().add(panel);
+		  panel.setLayout(null);
+			
+		  JLabel text = new JLabel("Player " + Integer.toString(winner+1) + " win!!");
+		  text.setFont(new Font("굴림", Font.PLAIN, 99));
+		  text.setBounds(444, 10, 978, 349);
+		  panel.add(text);
+		  
+		  JButton restart = new JButton("restart");
+		  restart.setBounds(196, 342, 350, 276);
+		  restart.addActionListener(e -> {
+			  // 클릭된 버튼 인덱스를 큐에 넣음 (한 번만 가능)
+			  try {
+				  clickQueue.put(1);
+			  } catch (InterruptedException e1) {
+				  // TODO Auto-generated catch block
+				  e1.printStackTrace();
+			  }
+           	});
+		  panel.add(restart);
+			
+		  JButton btnEnd = new JButton("end");
+		  btnEnd.setBounds(1017, 342, 350, 276);
+		  btnEnd.addActionListener(e -> {
+			  // 클릭된 버튼 인덱스를 큐에 넣음 (한 번만 가능)
+			  try {
+				  clickQueue.put(0);
+			  } catch (InterruptedException e1) {
+				  // TODO Auto-generated catch block
+				  e1.printStackTrace();
+			  }
+           	});
+		  panel.add(btnEnd);
+		  
+		  frame.revalidate();
+		  frame.repaint();
+		  try {
+			  output = clickQueue.take();
+			  frame.dispose();
+			  // 버튼 클릭까지 대기
+			  return output;
+		  } catch (InterruptedException e) {
+			  Thread.currentThread().interrupt();
+			  return -1; // 예외 발생 시 -1 반환
+		  }
 	  }
 	  //player 0~3
 	  public void turnchange(int turn) {
-		  
+		  for(int i = 0 ; i<turn_label.length ; i++) {
+			  turn_label[i].setVisible(false);
+		  }
+		  turn_label[turn].setVisible(true);
+	  }
+	  
+	  //윷 던진 결과를 UI에 보여주는 메서드: 인수로 윷 던진 결과의 횟수 배열 필요(index 0-> 도, 1-> 개, 2->걸, 3-> 윷, 4->모: 각 인덱스에 이동 횟수 저장)
+	  public void yut_state_update(int[] state_arr) {
+		  for(int i = 0 ; i<6 ; i++) {
+			  yut_state_text[i].setText(Integer.toString(state_arr[i]));
+		  }
 	  }
 	  
 	  public static void main(String[] args) {
 		  UI a= new UI();
 		  int[] num=a.gamesetup();
-		  
+
 	  }
 	  
 	//원 모양 패널을 만들기 위한 class
