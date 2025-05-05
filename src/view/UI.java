@@ -23,7 +23,7 @@ public class UI implements View{
 	
 	JPanel[] player;	//플레이어 패널 저장 배열
 	JLabel[] turn_label;//플레이어 패널 영역에 있는 "your turn" 라벨 배열
-	JPanel[][] piece;	//플레이어 수 X 말의 수 shape의 말 패널 배열
+	JButton[][] piece;	//플레이어 수 X 말의 수 shape의 말 패널 배열
 	JPanel[] map_node;		//맵의 노드 패널 배열
 	
 	//////////////////////////////////////////////////////////////////////////////////추가
@@ -34,7 +34,7 @@ public class UI implements View{
 	private Image boardImg;		//윷 판 이미지->gamesetup 메서드에서만 사용
 	
 	//게임 시작 및 맵, 플레이어, 말 수 반환 type int[map, player, piece] map은 4 5 6 (사각형, 오각형, 육각형)
-	public int[] gamesetup(){
+	public int[] gameSetup(){
 		
 		/*프로그램 시작 시 윷놀이를 설정하기 위한 시작 폼*/
 		JPanel panel = new JPanel(new GridLayout(0, 2, 8, 8));
@@ -114,7 +114,7 @@ public class UI implements View{
 				   {30,27,145},{67,229,71},{67,363,71},{67,495,71},{67,628,71},
 				   {31, 755, 145},{233,793,71},{366,793,71},{498,793,71},{630,793,71},
 				   {663,661,71},{565,561,71},{394,392,145},{662,198,71},{562,297,71},
-				   {201,197,71},{299,297,71},{199,658,71},{300,561,71}};;
+				   {201,197,71},{299,297,71},{199,658,71},{300,561,71}};
 		int map_len=29;
 		
 		//맵의 형태에 따른 맵 이미지 및 변수 데이터 설정
@@ -180,7 +180,7 @@ public class UI implements View{
         //player와 your turn 라벨, 그리고 말의 패널들을 저장하는 배열 할당
         player= new JPanel[player_count];
         turn_label=new JLabel[player_count];
-        piece=new JPanel[player_count][piece_count];
+        piece=new CircleButton[player_count][piece_count];
         
         //플레이어 패널 안에서 각 말들의 위치(0~5번 행이 각 말들의 위치를 나타냄)
         int[][] piece_position= {{33,30},{112,30},{191,30},
@@ -202,7 +202,7 @@ public class UI implements View{
   		  	turn_label[i].setVisible(false);
   		  	
   		  	for(int j=0;j<piece_count;j++) {
-  		  		piece[i][j]=new CirclePanel(46);
+  		  		piece[i][j]=new CircleButton(46);
   		  		piece[i][j].setBounds(piece_position[j][0],piece_position[j][1], 46,46);
   		  		piece[i][j].setBackground(new Color(piece_color[i][0],piece_color[i][1],piece_color[i][2]));
   		//////////////////////////////////////////////////////////////////////////////////추가
@@ -259,16 +259,18 @@ public class UI implements View{
 		  	
 	}
 
-	  //piece(0~4)가 map_index 에 도착(만약 먹혔으면 -1, 도착했으면 100)
-	public void mapupdate(User[] user){
+	  //user들의 각 말들을 맵에 업데이트 하는 함수()
+	public void mapUpdate(User[] user){
 		  
 		  //플레이어 패널 안에서 각 말들의 위치(0~5번 행이 각 말들의 위치를 나타냄)
 		int[][] piece_position= {{33,30},{112,30},{191,30},
 	        						 {33,112},{112,112}};
 		
+		//각 player의 말 읽어들이기
 		for(int i=0;i<user.length;i++) {
 			ArrayList<Horse> pieces=user[i].getHorses();
 			
+			//말 배열 loop 문
 			for(int j=0;j<pieces.size();j++) {
 				int state=pieces.get(j).getStatus();
 				int location;
@@ -276,25 +278,37 @@ public class UI implements View{
 				piece[i][j].removeAll();
 				
 				switch(state) {
+				//말이 대기 상태인 겨우
 				case Horse.WAITING:
 					piece[i][j].setLocation(piece_position[j][0],piece_position[j][1]);
 					player[i].add(piece[i][j]);
 					break;
+				//말이 맵 위에 있는 경우
 				case Horse.ON_MAP:
 					location=pieces.get(j).getLocation();
 					map_node[location].add(piece[i][j]);
 					break;
+				//말이 겹쳐진 경우->하나의 말만 표시
 				case Horse.OVERLAPPED:
 					location=pieces.get(j).getLocation();
-					int count=pieces.get(j).getCount();
+					//표시 되지 않는 말은 표시되지 않도록 설정
+					if(location==-1) {
+						Container parent=piece[i][j].getParent();
+						if(parent!=null) {
+							parent.remove(piece[i][j]);
+						}
+					}
+					int count=pieces.get(j).getCount();//겹쳐진 말의 수
+					//겹쳐진 말의 수를 text로 표시
 					JLabel group_count=new JLabel(String.valueOf(count));
 					piece[i][j].add(group_count);
-					map_node[location].removeAll();
 					map_node[location].add(piece[i][j]);
 					break;
+					//말이 도착한 경우
 				case Horse.ARRIVED:
 					piece[i][j].setLocation(piece_position[j][0],piece_position[j][1]);
 					player[i].add(piece[i][j]);
+					//도착이 완료된 말은 player 패널에 "완료"라고 작성
 					piece[i][j].setEnabled(false);
 					JLabel complete=new JLabel("도착");
 					piece[i][j].add(complete);
@@ -352,7 +366,7 @@ public class UI implements View{
 	  }
 
 	  //return 0~5 빽도 도 개 걸 윷 모
-	  public int choice_yut(){
+	  public int choiceYut(){
 		  	int output;
 		  	BlockingQueue<Integer> clickQueue = new ArrayBlockingQueue<>(1);
 			JLabel choiceone = new JLabel("CHOOSE ONE");
@@ -401,7 +415,7 @@ public class UI implements View{
 	  }
 
 	  // return chosen horse number    start from 0
-	  public int choice_horse(int turn){
+	  public int choiceHorse(int turn){
 		  JButton horse_button[] = new JButton[piece[0].length];
 		  int output;
 		  BlockingQueue<Integer> clickQueue = new ArrayBlockingQueue<>(1);
@@ -494,7 +508,7 @@ public class UI implements View{
 		  }
 	  }
 	  //player 0~3
-	  public void turnchange(int turn) {
+	  public void turnChange(int turn) {
 		  for(int i = 0 ; i<turn_label.length ; i++) {
 			  turn_label[i].setVisible(false);
 		  }
@@ -502,16 +516,10 @@ public class UI implements View{
 	  }
 	  
 	  //윷 던진 결과를 UI에 보여주는 메서드: 인수로 윷 던진 결과의 횟수 배열 필요(index 0-> 도, 1-> 개, 2->걸, 3-> 윷, 4->모: 각 인덱스에 이동 횟수 저장)
-	  public void yut_state_update(int[] state_arr) {
+	  public void yutStateUpdate(int[] state_arr) {
 		  for(int i = 0 ; i<6 ; i++) {
 			  yut_state_text[i].setText(Integer.toString(state_arr[i]));
 		  }
-	  }
-	  
-	  public static void main(String[] args) {
-		  UI a= new UI();
-		  int[] num=a.gamesetup();
-
 	  }
 	  
 	//원 모양 패널을 만들기 위한 class
@@ -553,5 +561,55 @@ public class UI implements View{
 		        return dx * dx + dy * dy <= radius * radius;
 		    }
 		}
+	  
+	  public class CircleButton extends JButton {
+
+		    private final int diameter;
+
+		    public CircleButton(int diameter) {
+		        this.diameter = diameter;
+
+		        /* ----------- 버튼 기본 설정 끄기 ----------- */
+		        setOpaque(false);              // 배경 사각형 안 칠함
+		        setContentAreaFilled(false);   // UI delegate 배경 OFF
+		        setBorderPainted(false);       // 테두리 OFF
+		        setFocusPainted(false);        // 포커스 링 OFF
+
+		        setPreferredSize(new Dimension(diameter, diameter));
+		        setBackground(new Color(0, 0, 0, 128)); // 원 색
+		    }
+
+		    @Override
+		    protected void paintComponent(Graphics g) {
+		        /* 필요하다면 롤오버·클릭 상태에 따라 색 바꾸기 */
+		        Color fill = getModel().isArmed() ?    // 눌렀을 때
+		                     getBackground().darker() :
+		                     getBackground();
+
+		        Graphics2D g2 = (Graphics2D) g.create();
+		        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+		                            RenderingHints.VALUE_ANTIALIAS_ON);
+
+		        g2.setColor(fill);
+		        g2.fillOval(0, 0, diameter, diameter);
+
+		        g2.dispose();
+		        /* super.paintComponent(g);  // 사각형 배경을 안 그리도록 호출 생략 */
+		    }
+
+		    /** 클릭 영역을 원 내부로 제한 */
+		    @Override
+		    public boolean contains(int x, int y) {
+		        int r  = diameter / 2;
+		        int dx = x - r;
+		        int dy = y - r;
+		        return dx * dx + dy * dy <= r * r;
+		    }
+		    
+		    
+		}
+	  
+	  
+	  
 		  
 }

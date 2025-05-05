@@ -19,26 +19,26 @@ public class User implements User_Interface {
 	}
 	
 	
-	public void groupHorse(Horse from, Horse to) {	//from ¸»À» to ¸»·Î ¾÷À½.
+	public void groupHorse(Horse from, Horse to) {	//from ï¿½ï¿½ï¿½ï¿½ to ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½.
 		try {
-			if(from.getLocation() == to.getLocation()) {	//µÎ ¸»ÀÇ À§Ä¡°¡ °°¾Æ¾ß ¾÷À» ¼ö ÀÖÀ½. ±×·² °æ¿ì µÎ ¸»ÀÇ °³¼ö¸¦ ´õÇÏ°í from ¸»ÀÇ °³¼ö¸¦ 0, »óÅÂ¸¦ ¾÷ÈûÀ¸·Î ÀüÈ¯
+			if(from.getLocation() == to.getLocation()) {	//ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ä¡ï¿½ï¿½ ï¿½ï¿½ï¿½Æ¾ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½. ï¿½×·ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ï°ï¿½ from ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ 0, ï¿½ï¿½ï¿½Â¸ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½È¯
 				to.setCount(to.getCount() + from.getCount());
 				from.setCount(0);
 				from.setLocation(-1);
 				from.setStatus(Horse.OVERLAPPED);
-			} else {	//µÎ ¸»ÀÇ À§Ä¡°¡ ´Ù¸¦ °æ¿ì ¿¡·¯
+			} else {	//ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ä¡ï¿½ï¿½ ï¿½Ù¸ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 				throw new RuntimeException();
 			}
 		} catch(Exception e) {
-			System.out.println("À§Ä¡°¡ ´Ù¸¥ ¸»À» ¾÷À¸·Á ÇÏ°í ÀÖÀ½.");
+			System.out.println("ï¿½ï¿½Ä¡ï¿½ï¿½ ï¿½Ù¸ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ï°ï¿½ ï¿½ï¿½ï¿½ï¿½.");
 		}
 		
 	}
 	
-	public void catchHorse(Horse from, Horse to) {	//from ¸»À» to ¸»ÀÌ ÀâÀ½
+	public void catchHorse(Horse from, Horse to) {	//from ï¿½ï¿½ï¿½ï¿½ to ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 		try {
-			if(from.getLocation() == to.getLocation()) {	//À§Ä¡°¡ °°¾Æ¾ß¸¸ ÀâÀ½
-				to.setStatus(Horse.WAITING);				//ÀâÈù ¸»ÀÇ »óÅÂ, À§Ä¡¸¦ ÃÊ±âÈ­. ÀâÈù ¸»ÀÌ ¾÷ÇôÀÖÀ» °æ¿ì¸¦ »ý°¢ÇØ ÀâÈù ¸»ÀÇ °³¼ö°¡ 1ÀÌ µÉ ¶§ ±îÁö overlappedµÈ ¸»µéÀ» ÇÏ³ª ¾¿ waitingÀ¸·Î ¹Ù²Þ
+			if(from.getLocation() == to.getLocation()) {	//ï¿½ï¿½Ä¡ï¿½ï¿½ ï¿½ï¿½ï¿½Æ¾ß¸ï¿½ ï¿½ï¿½ï¿½ï¿½
+				to.setStatus(Horse.WAITING);				//ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½, ï¿½ï¿½Ä¡ï¿½ï¿½ ï¿½Ê±ï¿½È­. ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ì¸¦ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ 1ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ overlappedï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ï³ï¿½ ï¿½ï¿½ waitingï¿½ï¿½ï¿½ï¿½ ï¿½Ù²ï¿½
 				to.setLocation(-1);
 				if (to.getCount() > 1) {
 					int currentCount;
@@ -57,7 +57,7 @@ public class User implements User_Interface {
 				throw new RuntimeException();
 			}
 		} catch(Exception e) {
-			System.out.println("À§Ä¡°¡ ´Ù¸¥ ¸»À» ÀâÀ¸·Á ÇÔ");
+			System.out.println("ï¿½ï¿½Ä¡ï¿½ï¿½ ï¿½Ù¸ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½");
 		}
 	}
 	public boolean checkHorseArrived(Horse horse) {		
@@ -81,25 +81,25 @@ public class User implements User_Interface {
 	}
 	
 	@Override
-	public int moveHorse(Horse horse, int count, int mapStyle) { //¿òÁ÷ÀÏ ¸», Ä­¼ö, ¸Ê ÇüÅÂ¸¦ ¹Þ¾Æ¼­ ÀÌµ¿½ÃÅ³ ¸»ÀÇ µµÂø ÁöÁ¡ index ¸®ÅÏ
-		int startPoint = 0;  //ÀÌµ¿ Àü ¸»ÀÇ À§Ä¡
+	public int moveHorse(Horse horse, int count, int mapStyle) { //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½, Ä­ï¿½ï¿½, ï¿½ï¿½ ï¿½ï¿½ï¿½Â¸ï¿½ ï¿½Þ¾Æ¼ï¿½ ï¿½Ìµï¿½ï¿½ï¿½Å³ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ index ï¿½ï¿½ï¿½ï¿½
+		int startPoint = 0;  //ï¿½Ìµï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ä¡
 		try {
-			if (horse.getStatus() == Horse.WAITING) { //¸»ÀÌ ¾ÆÁ÷ ´ë±â »óÅÂÀÎ °æ¿ì (¸ÊÀ¸·Î ³ª°¡Áö ¾ÊÀº °æ¿ì) ½ÃÀÛ ÀÎµ¦½º¸¦ 0À¸·Î ¸¸µé°í ¸»ÀÇ »óÅÂ¸¦ ON_MAPÀ¸·Î º¯°æ
+			if (horse.getStatus() == Horse.WAITING) { //ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ (ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½) ï¿½ï¿½ï¿½ï¿½ ï¿½Îµï¿½ï¿½ï¿½ï¿½ï¿½ 0ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Â¸ï¿½ ON_MAPï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 				startPoint = 0;
 				horse.setStatus(Horse.ON_MAP);
-			} else if (horse.getStatus() == Horse.ON_MAP) { //¸»ÀÌ ÀÌ¹Ì ¸Ê¿¡ ÀÖ´Â °æ¿ì ¸»ÀÇ À§Ä¡°¡ ½ÃÀÛ ÀÎµ¦½º
+			} else if (horse.getStatus() == Horse.ON_MAP) { //ï¿½ï¿½ï¿½ï¿½ ï¿½Ì¹ï¿½ ï¿½Ê¿ï¿½ ï¿½Ö´ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ä¡ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Îµï¿½ï¿½ï¿½
 				startPoint = horse.getLocation();
-			} else { //¸»ÀÌ ÀÌ¹Ì ¾÷ÇôÀÖ°Å³ª µµÂøÇÑ ¸»ÀÏ °æ¿ì ¿¡·¯
+			} else { //ï¿½ï¿½ï¿½ï¿½ ï¿½Ì¹ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ö°Å³ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 				throw new RuntimeException();
 			}
 		} catch(Exception e) {
-			System.out.println("µµÂøÇß°Å³ª ¾÷ÇôÀÖ´Â ¸»À» ÀÌµ¿½ÃÅ°·Á ÇÏ°í ÀÖÀ½");
+			System.out.println("ï¿½ï¿½ï¿½ï¿½ï¿½ß°Å³ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ö´ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ìµï¿½ï¿½ï¿½Å°ï¿½ï¿½ ï¿½Ï°ï¿½ ï¿½ï¿½ï¿½ï¿½");
 		}
 		int dest;
-		if(count == -1) { //TO-DO 0´ë½Å °è»ê ÇÔ¼ö ³Ö¾î¾ßÇÔ, ¹éµµ ±¸ÇöÇØ¾ßÇÔ = HorseÀÇ prevIdx ÀÌ¿ë
-			dest = Board.followPath(startPoint, count, horse.getPrevIdx(), mapStyle); //¹éµµÇÔ¼ö
+		if(count == -1) { //TO-DO 0ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½Ô¼ï¿½ ï¿½Ö¾ï¿½ï¿½ï¿½ï¿½, ï¿½éµµ ï¿½ï¿½ï¿½ï¿½ï¿½Ø¾ï¿½ï¿½ï¿½ = Horseï¿½ï¿½ prevIdx ï¿½Ì¿ï¿½
+			dest = Board.followPath(startPoint, count, horse.getPrevIdx(), mapStyle); //ï¿½éµµï¿½Ô¼ï¿½
 		} else {
-			dest = Board.followPath(startPoint, count, mapStyle); //ÀÏ¹Ý ÇÔ¼ö
+			dest = Board.followPath(startPoint, count, mapStyle); //ï¿½Ï¹ï¿½ ï¿½Ô¼ï¿½
 		}
 		horse.setPrevIdx(horse.getLocation());
 		
