@@ -82,7 +82,7 @@ public class User implements User_Interface {
 	
 	@Override
 	public int moveHorse(Horse horse, int count, int mapStyle) { //움직일 말, 칸수, 맵 형태를 받아서 이동시킬 말의 도착 지점 index 리턴
-		int startPoint;  //이동 전 말의 위치
+		int startPoint = 0;  //이동 전 말의 위치
 		try {
 			if (horse.getStatus() == Horse.WAITING) { //말이 아직 대기 상태인 경우 (맵으로 나가지 않은 경우) 시작 인덱스를 0으로 만들고 말의 상태를 ON_MAP으로 변경
 				startPoint = 0;
@@ -97,9 +97,9 @@ public class User implements User_Interface {
 		}
 		int dest;
 		if(count == -1) { //TO-DO 0대신 계산 함수 넣어야함, 백도 구현해야함 = Horse의 prevIdx 이용
-			dest = 2134; //백도함수
+			dest = Board.followPath(startPoint, count, horse.getPrevIdx(), mapStyle); //백도함수
 		} else {
-			dest = 123123123; //일반 함수
+			dest = Board.followPath(startPoint, count, mapStyle); //일반 함수
 		}
 		horse.setPrevIdx(horse.getLocation());
 		
