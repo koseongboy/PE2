@@ -1,12 +1,14 @@
 package view;
 
-public interface view {
+import user.User;
+
+public interface View {
 
 	  //게임 시작 및 맵, 플레이어, 말 수 반환 type int[map, player, piece] map은 4 5 6 (사각형, 오각형, 육각형)
 	  public int[] gamesetup();
 
 	  //piece(0~4)가 map_index 에 도착(만약 먹혔으면 -1, 도착했으면 100)
-	  public void mapupdate(int piece, int map_index);
+	  public void mapupdate(User[] user);
 
 	  //return 0 means random button click, return 1 means select button click
 	  public int throwing();
