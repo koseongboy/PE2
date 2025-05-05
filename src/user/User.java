@@ -94,7 +94,15 @@ public class User implements User_Interface {
 		} catch(Exception e) {
 			System.out.println("도착했거나 업혀있는 말을 이동시키려 하고 있음");
 		}
-		int dest = mapStyle; //TO-DO 0대신 계산 함수 넣어야함 		
+		int dest;
+		if(count == -1) { //TO-DO 0대신 계산 함수 넣어야함, 백도 구현해야함 = Horse의 prevIdx 이용
+			dest = 2134; //백도함수
+		} else {
+			dest = 123123123; //일반 함수
+		}
+		horse.setPrevIdx(horse.getLocation());
+		
+		
 		
 		return dest;
 		

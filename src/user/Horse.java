@@ -9,6 +9,7 @@ public class Horse {
 	private int status = WAITING;
 	private int location = -1;
 	private int count = 1;
+	private int prevIdx = -1;
 	
 	
 	public int getStatus() {
@@ -22,6 +23,10 @@ public class Horse {
 	public int getCount() {
 		return count;
 	}
+	
+	public int getPrevIdx() {
+		return prevIdx;
+	}
 
 	public void setCount(int value) {
 		this.count = value;
@@ -33,6 +38,10 @@ public class Horse {
 	
 	public void setLocation(int location) {
 		this.location = location;
+	}
+	
+	public void setPrevIdx(int index) {
+		prevIdx = index;
 	}
 	
 }
