@@ -19,26 +19,26 @@ public class User implements User_Interface {
 	}
 	
 	
-	public void groupHorse(Horse from, Horse to) {	//from 말을 to 말로 업음.
+	public void groupHorse(Horse from, Horse to) {	//from 留먯쓣 to 留먮줈 �뾽�쓬.
 		try {
-			if(from.getLocation() == to.getLocation()) {	//두 말의 위치가 같아야 업을 수 있음. 그럴 경우 두 말의 개수를 더하고 from 말의 개수를 0, 상태를 업힘으로 전환
+			if(from.getLocation() == to.getLocation()) {	//�몢 留먯쓽 �쐞移섍� 媛숈븘�빞 �뾽�쓣 �닔 �엳�쓬. 洹몃윺 寃쎌슦 �몢 留먯쓽 媛쒖닔瑜� �뜑�븯怨� from 留먯쓽 媛쒖닔瑜� 0, �긽�깭瑜� �뾽�옒�쑝濡� �쟾�솚
 				to.setCount(to.getCount() + from.getCount());
 				from.setCount(0);
 				from.setLocation(-1);
 				from.setStatus(Horse.OVERLAPPED);
-			} else {	//두 말의 위치가 다를 경우 에러
+			} else {	//�몢 留먯쓽 �쐞移섍� �떎瑜� 寃쎌슦 �뿉�윭
 				throw new RuntimeException();
 			}
 		} catch(Exception e) {
-			System.out.println("위치가 다른 말을 업으려 하고 있음.");
+			System.out.println("�쐞移섍� �떎瑜� 留먯쓣 �뾽�쑝�젮 �븯怨� �엳�쓬.");
 		}
 		
 	}
 	
-	public void catchHorse(Horse from, Horse to) {	//from 말을 to 말이 잡음
+	public void catchHorse(Horse from, Horse to) {	//from 留먯쓣 to 留먯씠 �옟�쓬
 		try {
-			if(from.getLocation() == to.getLocation()) {	//위치가 같아야만 잡음
-				to.setStatus(Horse.WAITING);				//잡힌 말의 상태, 위치를 초기화. 잡힌 말이 업혀있을 경우를 생각해 잡힌 말의 개수가 1이 될 때 까지 overlapped된 말들을 하나 씩 waiting으로 바꿈
+			if(from.getLocation() == to.getLocation()) {	//�쐞移섍� 媛숈븘�빞留� �옟�쓬
+				to.setStatus(Horse.WAITING);				//�옟�엺 留먯쓽 �긽�깭, �쐞移섎�� 珥덇린�솕. �옟�엺 留먯씠 �뾽���엳�쓣 寃쎌슦瑜� �깮媛곹빐 �옟�엺 留먯쓽 媛쒖닔媛� 1�씠 �맆 �븣 源뚯� overlapped�맂 留먮뱾�쓣 �븯�굹 �뵫 waiting�쑝濡� 諛붽퓞
 				to.setLocation(-1);
 				if (to.getCount() > 1) {
 					int currentCount;
@@ -57,7 +57,7 @@ public class User implements User_Interface {
 				throw new RuntimeException();
 			}
 		} catch(Exception e) {
-			System.out.println("위치가 다른 말을 잡으려 함");
+			System.out.println("�쐞移섍� �떎瑜� 留먯쓣 �옟�쑝�젮 �븿");
 		}
 	}
 	public boolean checkHorseArrived(Horse horse) {		
@@ -80,34 +80,7 @@ public class User implements User_Interface {
 		} else return false;
 	}
 	
-	@Override
-	public int moveHorse(Horse horse, int count, int mapStyle) { //움직일 말, 칸수, 맵 형태를 받아서 이동시킬 말의 도착 지점 index 리턴
-		int startPoint = 0;  //이동 전 말의 위치
-		try {
-			if (horse.getStatus() == Horse.WAITING) { //말이 아직 대기 상태인 경우 (맵으로 나가지 않은 경우) 시작 인덱스를 0으로 만들고 말의 상태를 ON_MAP으로 변경
-				startPoint = 0;
-				horse.setStatus(Horse.ON_MAP);
-			} else if (horse.getStatus() == Horse.ON_MAP) { //말이 이미 맵에 있는 경우 말의 위치가 시작 인덱스
-				startPoint = horse.getLocation();
-			} else { //말이 이미 업혀있거나 도착한 말일 경우 에러
-				throw new RuntimeException();
-			}
-		} catch(Exception e) {
-			System.out.println("도착했거나 업혀있는 말을 이동시키려 하고 있음");
-		}
-		int dest;
-		if(count == -1) { //TO-DO 0대신 계산 함수 넣어야함, 백도 구현해야함 = Horse의 prevIdx 이용
-			dest = Board.followPath(startPoint, count, horse.getPrevIdx(), mapStyle); //백도함수
-		} else {
-			dest = Board.followPath(startPoint, count, mapStyle); //일반 함수
-		}
-		horse.setPrevIdx(horse.getLocation());
-		
-		
-		
-		return dest;
-		
-	}
+
 	
 
 }
