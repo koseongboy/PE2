@@ -23,13 +23,12 @@ public class UI implements View{
 	
 	JPanel[] player;	//플레이어 패널 저장 배열
 	JLabel[] turn_label;//플레이어 패널 영역에 있는 "your turn" 라벨 배열
-	JButton[][] piece;	//플레이어 수 X 말의 수 shape의 말 패널 배열
+	JPanel[][] piece;	//플레이어 수 X 말의 수 shape의 말 패널 배열
 	JPanel[] map_node;		//맵의 노드 패널 배열
 	
-	//////////////////////////////////////////////////////////////////////////////////추가
-	JPanel[] yut_state_image;//오른쪽 위의 윷 이미지
+	JLabel[] yut_state_image;//오른쪽 위의 윷 이미지
 	JLabel[] yut_state_text;//오른쪽 위 윷 텍스트
-	//////////////////////////////////////////////////////////////////////////////////추가
+	String[] yutUrl = {"도","개","걸","윷","모","빽도"};
 	
 	private Image boardImg;		//윷 판 이미지->gamesetup 메서드에서만 사용
 	
@@ -99,6 +98,18 @@ public class UI implements View{
         frame.setBounds(100, 100, 1640, 982);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(null);
+		
+		//##########################################################
+		final Image frameImg = new ImageIcon(UI.class.getResource("/images/배경색.png")).getImage();
+		JPanel background = new JPanel(null) {
+			@Override
+			protected void paintComponent(Graphics g) {
+				super.paintComponent(g);
+				g.drawImage(frameImg, 0, 0, getWidth(), getHeight(), this);
+			}
+		};
+		frame.setContentPane(background);
+		//##########################################################
 		
 		//맵 부분 패널 초기화
 		JPanel map = new JPanel();
@@ -180,18 +191,26 @@ public class UI implements View{
         //player와 your turn 라벨, 그리고 말의 패널들을 저장하는 배열 할당
         player= new JPanel[player_count];
         turn_label=new JLabel[player_count];
-        piece=new CircleButton[player_count][piece_count];
+        piece=new JPanel[player_count][piece_count];
         
         //플레이어 패널 안에서 각 말들의 위치(0~5번 행이 각 말들의 위치를 나타냄)
         int[][] piece_position= {{33,30},{112,30},{191,30},
         						 {33,112},{112,112}};
         //player에 따른 말들의 색 rgb 값
-        int[][] piece_color= {{255,0,0},{255,165,0},{0,255,0},{0,0,255}};        
+        int[][] piece_color= {{255,0,0},{255,165,0},{46, 155, 87},{0,0,255}};        
         
         //player와 your_turn, 그리고 말들의 패널을 저장하는 배열에 패널들을 저장
         for(int i=0;i<player_count;i++) {
-        	player[i]=new JPanel();
-        	player[i].setBackground(UIManager.getColor("Table.selectionBackground"));
+        	//###################################################################
+        	final Image playerImg = new ImageIcon(UI.class.getResource("/images/player"+(i+1)+".png")).getImage();
+        	player[i] = new JPanel(null) {
+        	    @Override
+        	    protected void paintComponent(Graphics g) {
+        	        super.paintComponent(g);
+        	        g.drawImage(playerImg, 0, 0, getWidth(), getHeight(), this);
+        	    }
+        	};
+        	//###################################################################
   		  	player[i].setBounds(player_position[i][0],player_position[i][1],269, 179);
   		  	frame.getContentPane().add(player[i]);
   		  	player[i].setLayout(null);
@@ -202,7 +221,7 @@ public class UI implements View{
   		  	turn_label[i].setVisible(false);
   		  	
   		  	for(int j=0;j<piece_count;j++) {
-  		  		piece[i][j]=new CircleButton(46);
+  		  		piece[i][j]=new JPanel();
   		  		piece[i][j].setBounds(piece_position[j][0],piece_position[j][1], 46,46);
   		  		piece[i][j].setBackground(new Color(piece_color[i][0],piece_color[i][1],piece_color[i][2]));
   		//////////////////////////////////////////////////////////////////////////////////추가
@@ -215,8 +234,15 @@ public class UI implements View{
         turn_label[0].setVisible(true);
         
         //윷 던지기 패널 초기화
-        throwing = new JPanel();
-		throwing.setBackground(new Color(139, 0, 139));
+        final Image yutImg = new ImageIcon(UI.class.getResource("/images/윷던지기_윷상태.png")).getImage();
+        throwing = new JPanel(null) {
+    	    @Override
+    	    protected void paintComponent(Graphics g) {
+    	        super.paintComponent(g);
+    	        g.drawImage(yutImg, 0, 0, getWidth(), getHeight(), this);
+    	    }
+    	};
+    	throwing.setBorder(BorderFactory.createLineBorder(Color.BLACK, 7));    	
 		throwing.setBounds(1200, 66, 424, 372);
 		frame.getContentPane().add(throwing);
 		throwing.setLayout(null);
@@ -224,19 +250,26 @@ public class UI implements View{
 		
 		
 		//윷 상태 패널 초기화	
-		yut_state = new JPanel();
-		yut_state.setBackground(new Color(46, 139, 87));
+		yut_state = new JPanel(null) {
+    	    @Override
+    	    protected void paintComponent(Graphics g) {
+    	        super.paintComponent(g);
+    	        g.drawImage(yutImg, 0, 0, getWidth(), getHeight(), this);
+    	    }
+    	};
+		yut_state.setBorder(BorderFactory.createLineBorder(Color.BLACK, 7));
 		yut_state.setBounds(1200, 516, 424, 372);
 		frame.getContentPane().add(yut_state);
 		yut_state.setLayout(null);
 		
-		//////////////////////////////////////////////////////////////////////////////////추가
-		yut_state_image = new JPanel[6];
+		yut_state_image = new JLabel[6];
 		for(int i = 0 ; i<6 ; i++) {
-			yut_state_image[i] = new JPanel();
+			yut_state_image[i] = new JLabel();
 		}
+		
 		int[][] yut_state_loc = new int[][]{{32,44,72,99},{176, 44, 72, 99},{320, 44, 72, 99},{32, 207, 72, 99},{176, 207, 72, 99},{320, 207, 72, 99}};
 		for(int i = 0 ; i<6 ; i++) {
+			yut_state_image[i].setIcon(new ImageIcon(UI.class.getResource("/images/"+yutUrl[i]+".png")));
 			yut_state_image[i].setBounds(yut_state_loc[i][0],yut_state_loc[i][1],yut_state_loc[i][2],yut_state_loc[i][3]);
 			yut_state.add(yut_state_image[i]);
 		}
@@ -250,7 +283,6 @@ public class UI implements View{
 			yut_state_text[i].setBounds(text_loc[i][0],text_loc[i][1],text_loc[i][2],text_loc[i][3]);
 			yut_state.add(yut_state_text[i]);
 		}
-		//////////////////////////////////////////////////////////////////////////////////추가
 		
 		frame.setVisible(true);
 		
@@ -324,7 +356,8 @@ public class UI implements View{
 	  public int throwing(){
 		 	int output;
 		  	BlockingQueue<Integer> clickQueue = new ArrayBlockingQueue<>(1);
-			JButton random_button = new JButton("random");
+			JButton random_button = new JButton();
+			random_button.setIcon(new ImageIcon(UI.class.getResource("/images/"+"랜덤윷던지기"+".png")));
 			random_button.setBounds(58, 146, 122, 54);
 			random_button.addActionListener(e -> {
                 // 클릭된 버튼 인덱스를 큐에 넣음 (한 번만 가능)
@@ -338,6 +371,7 @@ public class UI implements View{
 			throwing.add(random_button);
 			
 			JButton choose_button = new JButton("choose");
+			choose_button.setIcon(new ImageIcon(UI.class.getResource("/images/"+"선택윷던지기"+".png")));
 			choose_button.setBounds(242, 146, 122, 54);
 			choose_button.addActionListener(e -> {
                 // 클릭된 버튼 인덱스를 큐에 넣음 (한 번만 가능)
@@ -378,12 +412,13 @@ public class UI implements View{
 			
 			JButton button_arr[] = new JButton[6];
 			for(int i = 0 ; i<6 ; i++) {
-				button_arr[i] = new JButton("1");
+				button_arr[i] = new JButton();
 			}
 			
 			int [][] button_loc = {{32,44,72,99},{176, 44, 72, 99},{320, 44, 72, 99},{32, 207, 72, 99},{176, 207, 72, 99},{320, 207, 72, 99}};
 			for(int i = 0 ; i<6 ; i++) {
 				final int index = i;
+				button_arr[i].setIcon(new ImageIcon(UI.class.getResource("/images/"+yutUrl[i]+".png")));
 				button_arr[i].setBounds(button_loc[i][0],button_loc[i][1],button_loc[i][2],button_loc[i][3]);
 				button_arr[i].addActionListener(e -> {
 	                // 클릭된 버튼 인덱스를 큐에 넣음 (한 번만 가능)
@@ -411,6 +446,7 @@ public class UI implements View{
 		        } catch (InterruptedException e) {
 		            Thread.currentThread().interrupt();
 		            return -1; // 예외 발생 시 -1 반환
+
 		        }
 	  }
 
@@ -421,7 +457,9 @@ public class UI implements View{
 		  BlockingQueue<Integer> clickQueue = new ArrayBlockingQueue<>(1);
 		  for(int i = 0 ;i<piece[0].length; i++) {
 			  final int index = i;
-			  horse_button[i] = new JButton(Integer.toString(i)+"번");
+			  horse_button[i] = new JButton();
+			  horse_button[i].setOpaque(false);
+			  horse_button[i].setContentAreaFilled(false);
 			  horse_button[i].addActionListener(e -> {
 	                // 클릭된 버튼 인덱스를 큐에 넣음 (한 번만 가능)
 	            	try {
@@ -450,6 +488,7 @@ public class UI implements View{
 		        } catch (InterruptedException e) {
 		            Thread.currentThread().interrupt();
 		            return -1; // 예외 발생 시 -1 반환
+
 		        }
 	  }
 
@@ -461,6 +500,7 @@ public class UI implements View{
 		  	
 		  JPanel panel = new JPanel();
 		  panel.setBounds(25, 10, 1587, 923);
+		  panel.setOpaque(false);
 		  frame.getContentPane().add(panel);
 		  panel.setLayout(null);
 			
@@ -469,7 +509,13 @@ public class UI implements View{
 		  text.setBounds(444, 10, 978, 349);
 		  panel.add(text);
 		  
-		  JButton restart = new JButton("restart");
+		  JLabel background = new JLabel();
+		  background.setIcon(new ImageIcon(UI.class.getResource("/images/끝배경.png")));
+		  background.setBounds(0, 0, 1672, 992);
+		  frame.getContentPane().add(background);
+		  
+		  JButton restart = new JButton();
+		  restart.setIcon(new ImageIcon(UI.class.getResource("/images/"+"재시작버튼"+".png")));
 		  restart.setBounds(196, 342, 350, 276);
 		  restart.addActionListener(e -> {
 			  // 클릭된 버튼 인덱스를 큐에 넣음 (한 번만 가능)
@@ -482,7 +528,8 @@ public class UI implements View{
            	});
 		  panel.add(restart);
 			
-		  JButton btnEnd = new JButton("end");
+		  JButton btnEnd = new JButton();
+		  btnEnd.setIcon(new ImageIcon(UI.class.getResource("/images/"+"끝내기버튼"+".png")));
 		  btnEnd.setBounds(1017, 342, 350, 276);
 		  btnEnd.addActionListener(e -> {
 			  // 클릭된 버튼 인덱스를 큐에 넣음 (한 번만 가능)
@@ -505,6 +552,7 @@ public class UI implements View{
 		  } catch (InterruptedException e) {
 			  Thread.currentThread().interrupt();
 			  return -1; // 예외 발생 시 -1 반환
+
 		  }
 	  }
 	  //player 0~3
@@ -531,7 +579,7 @@ public class UI implements View{
 		        this.diameter = diameter;
 		        setOpaque(false); // 배경은 투명
 		        setPreferredSize(new Dimension(diameter, diameter));
-		        setBackground(new Color(0, 0, 0, 128)); // 기본 원 색 (투명)
+		        setBackground(new Color(0, 0, 0, 0)); // 기본 원 색 (투명)
 		    }
 
 		    @Override
@@ -562,54 +610,11 @@ public class UI implements View{
 		    }
 		}
 	  
-	  public class CircleButton extends JButton {
-
-		    private final int diameter;
-
-		    public CircleButton(int diameter) {
-		        this.diameter = diameter;
-
-		        /* ----------- 버튼 기본 설정 끄기 ----------- */
-		        setOpaque(false);              // 배경 사각형 안 칠함
-		        setContentAreaFilled(false);   // UI delegate 배경 OFF
-		        setBorderPainted(false);       // 테두리 OFF
-		        setFocusPainted(false);        // 포커스 링 OFF
-
-		        setPreferredSize(new Dimension(diameter, diameter));
-		        setBackground(new Color(0, 0, 0, 128)); // 원 색
-		    }
-
-		    @Override
-		    protected void paintComponent(Graphics g) {
-		        /* 필요하다면 롤오버·클릭 상태에 따라 색 바꾸기 */
-		        Color fill = getModel().isArmed() ?    // 눌렀을 때
-		                     getBackground().darker() :
-		                     getBackground();
-
-		        Graphics2D g2 = (Graphics2D) g.create();
-		        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-		                            RenderingHints.VALUE_ANTIALIAS_ON);
-
-		        g2.setColor(fill);
-		        g2.fillOval(0, 0, diameter, diameter);
-
-		        g2.dispose();
-		        /* super.paintComponent(g);  // 사각형 배경을 안 그리도록 호출 생략 */
-		    }
-
-		    /** 클릭 영역을 원 내부로 제한 */
-		    @Override
-		    public boolean contains(int x, int y) {
-		        int r  = diameter / 2;
-		        int dx = x - r;
-		        int dy = y - r;
-		        return dx * dx + dy * dy <= r * r;
-		    }
-		    
-		    
-		}
-	  
-	  
+	  public static void main(String[] args) {
+		  View a=new UI();
+		  a.gameSetup();
+	  }
 	  
 		  
 }
+
