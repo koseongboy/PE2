@@ -1,5 +1,5 @@
 package view;
-import user.User;
+import model.*;
 
 public interface View {
 
@@ -7,15 +7,15 @@ public interface View {
 	  public int[] gameSetup();
 
 	  //piece(0~4)가 map_index 에 도착(만약 먹혔으면 -1, 도착했으면 100)
-	  public void mapUpdate(User[] user);
+	  public void mapUpdate(Player[] players);
 
 	  //return 0 means random button click, return 1 means select button click
-	  public int throwing();
+	  public boolean throwing();
 
 	  //return 0~5 빽도 도 개 걸 윷 모
 	  public int choiceYut();
 	  // return chosen horse number    start from 0
-	  public int choiceHorse(int turn);
+	  public int choicePiece(int turn);
 	  //윷 던진 결과를 UI에 보여주는 메서드: 인수로 윷 던진 결과의 횟수 배열 필요(index 0-> 도, 1-> 개, 2->걸, 3-> 윷, 4->모: 각 인덱스에 이동 횟수 저장)
 	  public void yutStateUpdate(int[] state_arr);
 

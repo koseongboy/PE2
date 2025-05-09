@@ -11,8 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.*;
 
-import user.User;
-import user.Horse;
+import model.*;
 
 
 public class UI implements View{
@@ -266,13 +265,14 @@ public class UI implements View{
 		for(int i = 0 ; i<6 ; i++) {
 			yut_state_image[i] = new JLabel();
 		}
-		
+		/*
 		int[][] yut_state_loc = new int[][]{{32,44,72,99},{176, 44, 72, 99},{320, 44, 72, 99},{32, 207, 72, 99},{176, 207, 72, 99},{320, 207, 72, 99}};
 		for(int i = 0 ; i<6 ; i++) {
 			yut_state_image[i].setIcon(new ImageIcon(UI.class.getResource("/images/"+yutUrl[i]+".png")));
 			yut_state_image[i].setBounds(yut_state_loc[i][0],yut_state_loc[i][1],yut_state_loc[i][2],yut_state_loc[i][3]);
 			yut_state.add(yut_state_image[i]);
 		}
+        */
 		
 		yut_state_text = new JLabel[6];
 		for(int i = 0 ; i<6 ; i++) {
@@ -292,39 +292,39 @@ public class UI implements View{
 	}
 
 	  //user들의 각 말들을 맵에 업데이트 하는 함수()
-	public void mapUpdate(User[] user){
+	public void mapUpdate(Player[] players){
 		  
 		  //플레이어 패널 안에서 각 말들의 위치(0~5번 행이 각 말들의 위치를 나타냄)
 		int[][] piece_position= {{33,30},{112,30},{191,30},
 	        						 {33,112},{112,112}};
 		
 		//각 player의 말 읽어들이기
-		for(int i=0;i<user.length;i++) {
-			ArrayList<Horse> pieces=user[i].getHorses();
+		for(int i=0;i<players.length;i++) {
+			ArrayList<Piece> pieces=players[i].getPieces();
 			
 			//말 배열 loop 문
 			for(int j=0;j<pieces.size();j++) {
-				int state=pieces.get(j).getStatus();
-				int location;
+				Piece.State state=pieces.get(j).getStatus();
+				Node position;
 				
 				piece[i][j].removeAll();
 				
 				switch(state) {
 				//말이 대기 상태인 겨우
-				case Horse.WAITING:
+				case Piece.State.WAITING:
 					piece[i][j].setLocation(piece_position[j][0],piece_position[j][1]);
 					player[i].add(piece[i][j]);
 					break;
 				//말이 맵 위에 있는 경우
-				case Horse.ON_MAP:
-					location=pieces.get(j).getLocation();
-					map_node[location].add(piece[i][j]);
+				case Piece.State.ON_BOARD:
+					position=pieces.get(j).getPosition();
+					map_node[position.id].add(piece[i][j]);
 					break;
 				//말이 겹쳐진 경우->하나의 말만 표시
-				case Horse.OVERLAPPED:
-					location=pieces.get(j).getLocation();
+				case Piece.State.OVERLAPPED:
+					position=pieces.get(j).getPosition();
 					//표시 되지 않는 말은 표시되지 않도록 설정
-					if(location==-1) {
+					if(position==null) {
 						Container parent=piece[i][j].getParent();
 						if(parent!=null) {
 							parent.remove(piece[i][j]);
@@ -334,10 +334,10 @@ public class UI implements View{
 					//겹쳐진 말의 수를 text로 표시
 					JLabel group_count=new JLabel(String.valueOf(count));
 					piece[i][j].add(group_count);
-					map_node[location].add(piece[i][j]);
+					map_node[position.id].add(piece[i][j]);
 					break;
 					//말이 도착한 경우
-				case Horse.ARRIVED:
+				case Piece.State.FINISHED:
 					piece[i][j].setLocation(piece_position[j][0],piece_position[j][1]);
 					player[i].add(piece[i][j]);
 					//도착이 완료된 말은 player 패널에 "완료"라고 작성
@@ -353,7 +353,7 @@ public class UI implements View{
 	  
 	  
 	  //return 0 means random button click, return 1 means select button click
-	  public int throwing(){
+	  public boolean throwing(){
 		 	int output;
 		  	BlockingQueue<Integer> clickQueue = new ArrayBlockingQueue<>(1);
 			JButton random_button = new JButton();
@@ -392,10 +392,11 @@ public class UI implements View{
 		        	throwing.revalidate();
 		        	throwing.repaint();
 		            // 버튼 클릭까지 대기
-		            return output;
+                    return (output != 0);
 		        } catch (InterruptedException e) {
 		            Thread.currentThread().interrupt();
-		            return -1; // 예외 발생 시 -1 반환
+		            //return -1; // 예외 발생 시 -1 반환
+                    return false;
 		        }
 	  }
 
@@ -451,7 +452,7 @@ public class UI implements View{
 	  }
 
 	  // return chosen horse number    start from 0
-	  public int choiceHorse(int turn){
+	  public int choicePiece(int turn){
 		  JButton horse_button[] = new JButton[piece[0].length];
 		  int output;
 		  BlockingQueue<Integer> clickQueue = new ArrayBlockingQueue<>(1);
@@ -610,11 +611,10 @@ public class UI implements View{
 		    }
 		}
 	  
-	  public static void main(String[] args) {
-		  View a=new UI();
-		  a.gameSetup();
-	  }
+	//   public static void main(String[] args) {
+	// 	  View a=new UI();
+	// 	  a.gameSetup();
+	//   }
 	  
 		  
 }
-
