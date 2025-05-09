@@ -515,11 +515,11 @@ public class UI implements View{
 						e1.printStackTrace();
 					}
 	            });
-			  
-			  piece[turn][i].add(horse_button[i], BorderLayout.CENTER);
-			  
-			  piece[turn][i].revalidate();
-			  piece[turn][i].repaint();
+			  if(piece[turn][i].getComponentCount()==0) {
+				  piece[turn][i].add(horse_button[i], BorderLayout.CENTER);
+				  piece[turn][i].revalidate();
+				  piece[turn][i].repaint();
+			  }
 			  
 		  }
 		  
