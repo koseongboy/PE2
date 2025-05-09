@@ -166,7 +166,7 @@ public class UI implements View{
         for(int i=0;i<map_len;i++) {
         	map_node[i]=new CirclePanel(node_location[i][2]);
         	map_node[i].setBounds(node_location[i][0],node_location[i][1], node_location[i][2],node_location[i][2]);
-        	map_node[i].setLayout(new GridBagLayout());
+        	map_node[i].setLayout(null);
         	map_node[i].setOpaque(false);
 		  	map.add(map_node[i]);
         	
@@ -265,14 +265,14 @@ public class UI implements View{
 		for(int i = 0 ; i<6 ; i++) {
 			yut_state_image[i] = new JLabel();
 		}
-		/*
+		
 		int[][] yut_state_loc = new int[][]{{32,44,72,99},{176, 44, 72, 99},{320, 44, 72, 99},{32, 207, 72, 99},{176, 207, 72, 99},{320, 207, 72, 99}};
 		for(int i = 0 ; i<6 ; i++) {
 			yut_state_image[i].setIcon(new ImageIcon(UI.class.getResource("/images/"+yutUrl[i]+".png")));
 			yut_state_image[i].setBounds(yut_state_loc[i][0],yut_state_loc[i][1],yut_state_loc[i][2],yut_state_loc[i][3]);
 			yut_state.add(yut_state_image[i]);
 		}
-        */
+        
 		
 		yut_state_text = new JLabel[6];
 		for(int i = 0 ; i<6 ; i++) {
@@ -314,11 +314,17 @@ public class UI implements View{
 				case Piece.State.WAITING:
 					piece[i][j].setLocation(piece_position[j][0],piece_position[j][1]);
 					player[i].add(piece[i][j]);
+					player[i].revalidate();
+					player[i].repaint();
 					break;
 				//말이 맵 위에 있는 경우
 				case Piece.State.ON_BOARD:
 					position=pieces.get(j).getPosition();
-					map_node[position.id].add(piece[i][j]);
+					int on_d = map_node[position.id].getHeight();          // 노드 지름
+					piece[i][j].setBounds((on_d-46)/2, (on_d-46)/2, 46, 46);
+					map_node[position.id].add(piece[i][j],BorderLayout.CENTER);
+					map_node[position.id].revalidate();
+					map_node[position.id].repaint();
 					break;
 				//말이 겹쳐진 경우->하나의 말만 표시
 				case Piece.State.OVERLAPPED:
@@ -328,13 +334,20 @@ public class UI implements View{
 						Container parent=piece[i][j].getParent();
 						if(parent!=null) {
 							parent.remove(piece[i][j]);
+							parent.revalidate();
+							parent.repaint();
 						}
 					}
 					int count=pieces.get(j).getCount();//겹쳐진 말의 수
 					//겹쳐진 말의 수를 text로 표시
 					JLabel group_count=new JLabel(String.valueOf(count));
 					piece[i][j].add(group_count);
-					map_node[position.id].add(piece[i][j]);
+					int over_d = map_node[position.id].getHeight();          // 노드 지름
+					piece[i][j].setBounds((over_d-46)/2, (over_d-46)/2, 46, 46);
+					map_node[position.id].add(piece[i][j],BorderLayout.CENTER);
+					map_node[position.id].add(piece[i][j],BorderLayout.CENTER);
+					map_node[position.id].revalidate();
+					map_node[position.id].repaint();
 					break;
 					//말이 도착한 경우
 				case Piece.State.FINISHED:
@@ -344,7 +357,12 @@ public class UI implements View{
 					piece[i][j].setEnabled(false);
 					JLabel complete=new JLabel("도착");
 					piece[i][j].add(complete);
+					player[i].revalidate();
+					player[i].repaint();
 				}
+				piece[i][j].revalidate();
+				piece[i][j].repaint();
+				
 			}
 		}
 	}
