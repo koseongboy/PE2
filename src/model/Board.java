@@ -4,12 +4,12 @@ import java.util.*;
 
 public class Board {
 
-    private Node start;                    // entry square
-    private int type;
-    private Node[] n;
+    public static Node start;                    // entry square
+    public static int type;
+    public static Node[] n;
 
     public Board(int type) {
-        this.type = type;
+        Board.type = type;
         // Build nodes
         if (type == 4) {
             n = new Node[29];
@@ -143,12 +143,19 @@ public class Board {
     // ---------- public API ---------------------------------------------------
     /** Follows regular or diagonal path depending on warp entry squares. */
     public Node followPath(ArrayList<Piece> pieces, int steps) {
+        if (pieces.get(0).getStatus() == Piece.State.WAITING){
+            pieces.get(0).setPosition(Board.start);
+            pieces.get(0).setStatus(Piece.State.ON_BOARD);
+        }
         Node cur = pieces.get(0).getPosition();
-        if (steps == 0){
+        if (steps == 5){
+            if (cur.before == null){
+                return cur;
+            }
             cur = cur.before;
         }else{        
-            for (int i = 0; i < steps; i++) {
-                if (i == 0 && cur.warp != null || (type==4 && cur.before.id == 26) ) {
+            for (int i = -1; i < steps; i++) {
+                if (i == -1 && cur.warp != null || (type==4 && (cur.before != null) && cur.before.id == 26) ) {
                     Node temp = cur;        
                     cur = cur.warp; // enter diagonal
                     cur.before = temp;

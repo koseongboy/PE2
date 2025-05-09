@@ -34,9 +34,10 @@ public class Manager{
             players[i] = new Player(pieceCount);  
         }
 
-        //game start : turn starts from 0
+        //game start : turn starts from 0Z
         int finishedPlayers = 0 ;
         while(finishedPlayers != playerCount-1){
+            
             startTurn();
             endTurn();          //finishing logic 추가
         }
@@ -112,6 +113,8 @@ public class Manager{
 
     private void endTurn() { 
         currentPlayer = (currentPlayer + 1) % players.length; 
+        permittedThrows = 1;
+        permittedMoves = new ArrayList<>();
         ui.turnChange(currentPlayer);
     }
 }

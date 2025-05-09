@@ -5,7 +5,7 @@ import java.util.ArrayList;
 
 public class Piece {
 	private final Player owner;
-	private Node pos;
+	private Node pos = null;
 	public enum State {
         WAITING,
         ON_BOARD,
@@ -54,8 +54,11 @@ public class Piece {
 	public ArrayList<Piece> getStackedPieces(){
 		ArrayList<Piece> pieces = owner.getPieces();
 		ArrayList<Piece> result = new ArrayList<>();
+		result.add(this);
 		for (Piece piece : pieces){
-			if (piece.getPosition() == this.getPosition()){result.add(piece);}
+			if ( (this != piece ) && piece.getStatus() == Piece.State.ON_BOARD && piece.getPosition() == this.getPosition()){
+				result.add(piece);
+			}
 		}
 		return result;
 	}

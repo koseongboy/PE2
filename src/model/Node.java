@@ -6,6 +6,8 @@ public final class Node {
     public Node before;
     public Node warp;
 
+    
+
     Node(int id) {
         this.id = id;
     }
