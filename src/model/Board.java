@@ -1,4 +1,5 @@
 package model;
+import java.nio.channels.Pipe.SourceChannel;
 import java.util.*;
 
 
@@ -7,8 +8,10 @@ public class Board {
     public static Node start;                    // entry square
     public static int type;
     public static Node[] n;
+    public ArrayList<Player> players;
 
-    public Board(int type) {
+    public Board(int type, ArrayList<Player> players) {
+        this.players = players;
         Board.type = type;
         // Build nodes
         if (type == 4) {
@@ -141,41 +144,246 @@ public class Board {
     // }
 
 
+    public ArrayList<Piece> getStackedPieces(Node position){
+        ArrayList<Piece> result = new ArrayList<>();
+        for (Player player : players){
+            for (Piece piece : player.getPieces()){
+                if (position.id == piece.getPosition().id){
+                    result.add(piece);
+                }
+            }
+        }
+        return result;
+    }
 
-    // ---------- public API ---------------------------------------------------
-    /** Follows regular or diagonal path depending on warp entry squares. */
-    public Node followPath(ArrayList<Piece> pieces, int steps) {
-        Node cur;
-        if (pieces.get(0).getStatus() == Piece.State.WAITING){
-            cur = Board.start;
+
+    // ----------------------- false == 한번 더 기회 안줘도 됨 / true == 한번 더 기회 줘야함(caught)
+    public Boolean followPath(ArrayList<Piece> sourcePieces, int steps) {
+
+        boolean result = false;
+
+        // 처음 말을 움직일 경우
+        if (sourcePieces.get(0).getStatus() == Piece.State.WAITING){
+            Piece sourcePiece = sourcePieces.get(0);
+
+            // 백도 나옴
+            if(steps == 5){
+                ArrayList<Piece> stackedPieces = getStackedPieces(start);
+                
+                // 시작점이 비어있음
+                if (stackedPieces.isEmpty()){
+                    sourcePiece.setPosition(start);
+                    sourcePiece.path.add(start);
+                    sourcePiece.setStatus(Piece.State.ON_BOARD);
+                }
+
+                // 시작점이 안비어있음
+                else{
+
+                    // 그루핑
+                    if ( stackedPieces.get(0).getOwner() == sourcePiece.getOwner()){
+                        
+                        // source 피스들을 담당
+                        sourcePiece.setPosition(start);
+                        sourcePiece.path.add(start);
+                        sourcePiece.setStatus(Piece.State.OVERLAPPED);
+                        int count = 1 + stackedPieces.size();
+                        sourcePiece.setCount(count);
+
+                        // dest piece 들의 상태 변경
+                        for (Piece destPiece : stackedPieces){
+                            destPiece.setStatus(Piece.State.OVERLAPPED);
+                            destPiece.setCount(count);
+                        }
+                    }
+
+                    // catching
+                    else{
+
+                        // source 피스들
+                        sourcePiece.setPosition(start);
+                        sourcePiece.path.add(start);
+                        sourcePiece.setStatus(Piece.State.ON_BOARD);
+
+                        // dest 피스들
+                        for (Piece destPiece : stackedPieces){
+                            destPiece.setPosition(null);
+                            destPiece.path.clear();
+                            destPiece.setStatus(Piece.State.WAITING);
+                            destPiece.setCount(1);
+                        }
+                        result = true;
+                    }
+                }
+            }
+            
+            // 백도가 아님
+            else{
+                Node destination = start;
+                ArrayList<Node> tempPath = new ArrayList<>();
+                tempPath.add(destination);
+                for (int i = -1; i < steps; i++) {
+                    destination = destination.next;
+                    tempPath.add(destination);
+                }
+                ArrayList<Piece> stackedPieces = getStackedPieces(destination);
+
+                // 목적지가 비어있음
+                if (stackedPieces.isEmpty()){
+                    sourcePiece.setPosition(destination);
+                    sourcePiece.path.addAll(tempPath);
+                    sourcePiece.setStatus(Piece.State.ON_BOARD);
+                }
+
+                // 안비어있음
+                else{
+
+                    // grouping
+                    if (stackedPieces.get(0).getOwner() == sourcePiece.getOwner()){
+                        
+                        // source 피스들을 담당
+                        sourcePiece.setPosition(destination);
+                        sourcePiece.path.addAll(tempPath);
+                        sourcePiece.setStatus(Piece.State.OVERLAPPED);
+                        int count = 1 + stackedPieces.size();
+                        sourcePiece.setCount(count);
+
+                        // dest piece 들의 상태 변경
+                        for (Piece destPiece : stackedPieces){
+                            destPiece.setStatus(Piece.State.OVERLAPPED);
+                            destPiece.setCount(count);
+                        }
+
+                    }
+
+                    // catching
+                    else{
+
+                        // source 피스들
+                        sourcePiece.setPosition(destination);
+                        sourcePiece.path.addAll(tempPath);
+                        sourcePiece.setStatus(Piece.State.ON_BOARD);
+
+                        // dest 피스들
+                        for (Piece destPiece : stackedPieces){
+                            destPiece.setPosition(null);
+                            destPiece.path.clear();
+                            destPiece.setStatus(Piece.State.WAITING);
+                            destPiece.setCount(1);
+                        }
+                    }
+                }
+            }
+        }
+
+        // 이미 보드에 있는 말을 움직이는 경우
+        else{
+
+            // 백도 나옴
+            if (steps == 5){
+
+                // 과거 없이, 시작점에서 백도가 나온 경우
+                if (sourcePieces.get(0).path.size() == 1 && sourcePieces.get(0).path.get(0).id == start.id ){
+
+                }
+
+                // 그렇지 않을 경우 정상적으로 백도
+                else{
+
+                    int secondToLastIndex = sourcePieces.get(0).path.size() - 2 ;
+                    Node previousNode = sourcePieces.get(0).path.get(secondToLastIndex);
+                    ArrayList<Piece> destPieces = getStackedPieces(previousNode);  // 현재 위치 직전 노드 위치를 가지고 반환
+
+                    // 백도한 위치가 비어있을 경우
+                    if (destPieces.isEmpty()){
+                        for (Piece sourcePiece : sourcePieces){
+                            sourcePiece.setPosition(previousNode);
+                            sourcePiece.path.removeLast();
+                        }
+
+                    }
+
+                    // 백도한 위치가 안 비워져 있을 경우
+                    else{
+
+                        // grouping 일 경우
+                        if(destPieces.get(0).getOwner() == sourcePieces.get(0).getOwner()){
+
+                            int count = sourcePieces.size() + destPieces.size();
+
+                            // source 피스들
+                            for (Piece sourcePiece : sourcePieces){
+                                sourcePiece.setPosition(previousNode);
+                                sourcePiece.path.removeLast();
+                                sourcePiece.setStatus(Piece.State.OVERLAPPED);
+                                sourcePiece.setCount(count);
+                            }
+
+                            // dest 피스들
+                            for (Piece destPiece : destPieces){
+                                destPiece.path = sourcePieces.get(0).path;
+                                destPiece.setStatus(Piece.State.OVERLAPPED);
+                                destPiece.setCount(count);
+                            }
+                        }
+
+                        // catching 일 경우
+                        else{
+
+                            // source 피스들
+                            for (Piece sourcePiece : sourcePieces){
+                                sourcePiece.setPosition(previousNode);
+                                sourcePiece.path.removeLast();
+                            }
+
+                            // dest 피스들
+                            for (Piece destPiece : destPieces){
+                                destPiece.setPosition(null);
+                                destPiece.path.clear();
+                                destPiece.setStatus(Piece.State.WAITING);
+                                destPiece.setCount(1);
+                            }
+                        }
+                    }
+                }
+            }
+
+            // 정상적인 윳 나옴
+            else{
+
+
+                
+            }
+
+
+
+
         }
         else {
-            cur = pieces.get(0).getPosition();
+            cur = sourcePieces.get(0).getPosition();
         }
         if (steps == 5){
-            if (pieces.get(0).aboutToFinish == false){
+            if (sourcePieces.get(0).aboutToFinish == false){
                 return cur;
             }
             cur = cur.before;
         }else{        
             for (int i = -1; i < steps; i++) {
                 if (i == -1 && cur.warp != null || (type==4 && (cur.before != null) && cur.before.id == 26) ) {
-                    Node temp = cur;        
+                    Node temp = cur;
                     cur = cur.warp; // enter diagonal
-                    cur.before = temp;
+                    for (Piece piece : sourcePieces){
+                        piece.path.add(temp);
+                    }
                 }
                 else {
                     Node temp = cur;        
                     cur = cur.next;
-                    cur.before = temp;
+                    for (Piece piece : sourcePieces){
+                        piece.path.add(temp);
+                    }
                 }
-                if (cur.next == start ) {
-                    pieces.get(0).aboutToFinish = true;
-                }
-                if (pieces.get(0).aboutToFinish && (cur == start.next)){
-                    for (Piece piece : pieces){piece.setStatus(Piece.State.FINISHED);}
-                    break;
-                }
+                if()
                 
             }
 

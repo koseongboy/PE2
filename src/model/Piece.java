@@ -6,12 +6,15 @@ import java.util.ArrayList;
 public class Piece {
 	private final Player owner;
 	private Node pos = null;
+	public ArrayList<Node> path = new ArrayList<>();
+
 	public enum State {
         WAITING,
         ON_BOARD,
 		OVERLAPPED,
         FINISHED
     }
+	
 	//직전 노드가 2개가 있음....(대각선으로 오는 방향도 생각)
 	boolean aboutToFinish = false;
 
@@ -52,15 +55,17 @@ public class Piece {
 	}
 	
 	public ArrayList<Piece> getStackedPieces(){
-		ArrayList<Piece> pieces = owner.getPieces();
 		ArrayList<Piece> result = new ArrayList<>();
-		result.add(this);
+		ArrayList<Piece> pieces = owner.getPieces();
 		for (Piece piece : pieces){
-			if ( (this != piece ) && piece.getStatus() == Piece.State.ON_BOARD && piece.getPosition() == this.getPosition()){
+			if (piece.getPosition() == this.getPosition()){
 				result.add(piece);
 			}
 		}
 		return result;
+	}
+	public void copyFrom(){
+
 	}
 	
 }

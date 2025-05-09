@@ -25,10 +25,11 @@ public class Player {
 	public void groupPieces(Piece from, Piece to) {	//from 말을 to 말로 업음.
 		try {
 			if(from.getPosition() == to.getPosition()) {	//두 말의 위치가 같아야 업을 수 있음. 그럴 경우 두 말의 개수를 더하고 from 말의 개수를 0, 상태를 업힘으로 전환
+				
 				to.setCount(to.getCount() + from.getCount());
-				from.setCount(0);
 				from.setPosition(null);
 				from.setStatus(Piece.State.OVERLAPPED);
+				to.setStatus(Piece.State.OVERLAPPED);
 				from.aboutToFinish = to.aboutToFinish;
 			} else {	//두 말의 위치가 다를 경우 에러
 				throw new RuntimeException();
@@ -46,7 +47,7 @@ public class Player {
 				from.setPosition(null);
 				if (from.getCount() > 1) {
 					int currentCount;
-					for(Piece h : pieces) {
+					for(Piece h : from.getOwner().getPieces()) {
 						if(h.getStatus() == Piece.State.OVERLAPPED) {
 							h.setStatus(Piece.State.WAITING);
 							h.setCount(1);

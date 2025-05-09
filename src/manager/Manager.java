@@ -80,25 +80,32 @@ public class Manager{
             arr[chosen_yut]--;
             ui.yutStateUpdate(arr);
             Node arrived_node = board.followPath(pieces, chosen_yut);
+
+            
+
             
             boolean catchedOrGrouped = false;
             for (Player player : players){
-                for (Piece originalPiece : player.getPieces()){
-                    if ((originalPiece != piece) && originalPiece.getPosition() == arrived_node ){     
+                for (Piece destPiece : player.getPieces()){
+                    if (destPiece.getPosition() == arrived_node ){     
                         // grouping - 비교하는 연산자가 맞음?   
                         if ( player == players[currentPlayer]){          
-                            for (Piece lpiece:pieces){
-                                lpiece.setPosition(arrived_node);
-                                lpiece.setStatus(Piece.State.ON_BOARD);
+                            {
+                                for (Piece sourcePiece: pieces){
+                                    sourcePiece.setPosition(arrived_node);
+                                    sourcePiece.copyFrom(destPiece);
+                                    
+                                }
                             }
-                            player.groupPieces(originalPiece,piece);
 
                         }
                         // catching
                         else{                       
                             piece.setPosition(arrived_node);
-                            piece.setStatus(Piece.State.ON_BOARD);
-                            player.catchPiece(originalPiece,piece);
+                            if (piece.getStatus() == Piece.State.WAITING){
+                                piece.setStatus(Piece.State.ON_BOARD);
+                            }
+                            player.catchPiece(destPiece,piece);
                             permittedThrows += 1;
                         }
                         catchedOrGrouped = true;
@@ -108,17 +115,20 @@ public class Manager{
                 }
             }
             
-            if (!catchedOrGrouped) {
+            if (!catchedOrGrouped && piece.getStatus() != Piece.State.FINISHED) {
                 piece.setPosition(arrived_node);
-                piece.setStatus(Piece.State.ON_BOARD);
+                if (piece.getStatus() == Piece.State.WAITING){
+                    piece.setStatus(Piece.State.ON_BOARD);
+                }
                 if (piece.getStatus() == Piece.State.FINISHED) {
                     for (Piece lpiece : pieces) {
                         lpiece.setPosition(null);
                         lpiece.setStatus(Piece.State.FINISHED);
                     }
                 }
-                ui.mapUpdate(players);
+                
             }
+            ui.mapUpdate(players);
             
         }
     }
