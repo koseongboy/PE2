@@ -104,9 +104,12 @@ public class Board {
             n[42].next = n[41];
             n[41].next = n[25];
 
+            n[32].warp = n[31];
             n[31].next = n[30];
             n[30].next = n[0];
             n[29].next = n[0];
+
+            
 
 
             start = n[0];
@@ -114,41 +117,13 @@ public class Board {
             
     }
 
-    // ---------- public API ------------------------------------------------
-
-    // /** Move p by 'steps' squares; returns true if it captured an enemy. */
-    // public boolean movePiece(Piece piece, int steps) {
-    //     Node start = ((piece.getPosition() == null) ? this.start : piece.getPosition());
-    //     Node dest = followPath(start, steps);
-
-    //     // ----- capture / stacking logic ----------
-    //     List<Piece> onDest = occ.get(dest);
-    //     boolean captured = false;
-
-    //     if (onDest != null && !onDest.isEmpty()) {
-    //         if (onDest.get(0).getOwner() != piece.getOwner()) {
-    //             /* capture: send enemy pieces back to start */
-    //             captured = true;
-    //             for (Piece enemy : onDest) {
-    //                 enemy.setPosition(null);
-    //             }
-    //             onDest.clear();
-    //         }
-    //     }
-
-    //     // ----- actually move ----------------------
-    //     occ.computeIfAbsent(dest, d -> new ArrayList<>()).add(piece);
-    //     if (piece.getPosition() != null) occ.get(piece.getPosition()).remove(piece);
-    //     piece.setPosition(dest);
-    //     return captured;
-    // }
 
 
     public ArrayList<Piece> getStackedPieces(Node position){
         ArrayList<Piece> result = new ArrayList<>();
         for (Player player : players){
             for (Piece piece : player.getPieces()){
-                if ( piece.getStatus() == Piece.State.ON_BOARD && position == piece.getPosition()) {
+                if ( (piece.getStatus() == Piece.State.ON_BOARD || piece.getStatus() == Piece.State.OVERLAPPED) && position == piece.getPosition()) {
                     result.add(piece);
                 }
             }

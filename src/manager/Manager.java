@@ -24,29 +24,32 @@ public class Manager{
     }
 
     public void runGame(){
-        //setup map,users,pieces
-        int[] gameState = ui.gameSetup();
-        int mapType = gameState[0];     //setup board
-        
-        int playerCount = gameState[1]; //setup 
-        int pieceCount = gameState[2];
+        int replay = 1;
+        while (replay == 1){
+            //setup map,users,pieces
+            int[] gameState = ui.gameSetup();
+            int mapType = gameState[0];     //setup board
+            
+            int playerCount = gameState[1]; //setup 
+            int pieceCount = gameState[2];
 
-        ArrayList<Player> players = new ArrayList<>();
+            ArrayList<Player> players = new ArrayList<>();
 
-        for (int i =0 ;i<playerCount ; i++){
-            players.add(new Player(pieceCount));
-        }
-        board = new Board(mapType,players);
+            for (int i =0 ;i<playerCount ; i++){
+                players.add(new Player(pieceCount));
+            }
+            board = new Board(mapType,players);
 
-
-        //game start : turn starts from 0Z
-        while(true){
-            int res = startTurn();
-            if (res>=0){
-                ui.gameEnd(res);
-                break;
-            };
-            endTurn();          //finishing logic 추가
+            //game start : turn starts from 0Z        
+            while(true){
+                int res = startTurn();
+                if (res>=0){
+                    replay = ui.end(res);
+                    break;
+                };
+                endTurn();          //finishing logic 추가
+            }
+            ui = new UI();
         }
         
     }
@@ -99,55 +102,7 @@ public class Manager{
                 if (j == board.players.get(currentPlayer).getPieces().size()){
                     return board.players.indexOf(board.players.get(currentPlayer));
                 }
-            }   
-            
-
-            
-            // boolean catchedOrGrouped = false;
-            // for (Player player : players){
-            //     for (Piece destPiece : player.getPieces()){
-            //         if (destPiece.getPosition() == arrived_node ){     
-            //             // grouping - 비교하는 연산자가 맞음?   
-            //             if ( player == players[currentPlayer]){          
-            //                 {
-            //                     for (Piece sourcePiece: pieces){
-            //                         sourcePiece.setPosition(arrived_node);
-            //                         sourcePiece.copyFrom(destPiece);
-                                    
-            //                     }
-            //                 }
-
-            //             }
-            //             // catching
-            //             else{                       
-            //                 piece.setPosition(arrived_node);
-            //                 if (piece.getStatus() == Piece.State.WAITING){
-            //                     piece.setStatus(Piece.State.ON_BOARD);
-            //                 }
-            //                 player.catchPiece(destPiece,piece);
-            //                 permittedThrows += 1;
-            //             }
-            //             catchedOrGrouped = true;
-            //             ui.mapUpdate(players);
-            //             break;
-            //         }
-            //     }
-            // }
-            
-            // if (!catchedOrGrouped && piece.getStatus() != Piece.State.FINISHED) {
-            //     piece.setPosition(arrived_node);
-            //     if (piece.getStatus() == Piece.State.WAITING){
-            //         piece.setStatus(Piece.State.ON_BOARD);
-            //     }
-            //     if (piece.getStatus() == Piece.State.FINISHED) {
-            //         for (Piece lpiece : pieces) {
-            //             lpiece.setPosition(null);
-            //             lpiece.setStatus(Piece.State.FINISHED);
-            //         }
-            //     }
-                
-            // }
-            
+            }              
             
         }
         return -1;
