@@ -618,6 +618,20 @@ public class UI implements View{
 		  }
 	  }
 	  
+	  public void gameEnd(int player) {
+		    // 1) 다이얼로그를 frame을 부모로 해서 띄우기
+		    String message = "Player " + (player + 1) + " is Winner!";
+		    JOptionPane.showMessageDialog(
+		        frame,                         // 부모 컴포넌트로 frame 지정
+		        message,                       // 표시할 텍스트
+		        "Game End",                    // 다이얼로그 타이틀
+		        JOptionPane.INFORMATION_MESSAGE
+		    );
+		    
+		    // 2) 다이얼로그가 닫힌 뒤에 frame도 종료
+		    frame.dispose();
+		}
+	  
 	//원 모양 패널을 만들기 위한 class
 	  public class CircleLayeredPane extends JLayeredPane {
 		    private final int diameter;
@@ -636,12 +650,6 @@ public class UI implements View{
 		        g.setColor(getBackground());
 		        g.fillOval(0, 0, diameter, diameter);
 		    }
-		}
-	  
-	//   public static void main(String[] args) {
-	// 	  View a=new UI();
-	// 	  a.gameSetup();
-	//   }
-	  
+		}	  
 		  
 }
