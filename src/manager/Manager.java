@@ -50,13 +50,13 @@ public class Manager{
                 if (ui.throwing() == true) {
                     int moveCount = ui.choiceYut();
                     permittedMoves.add(moveCount);
-                    if (moveCount == 4 || moveCount == 5) permittedThrows += 1;
+                    if (moveCount == 3 || moveCount == 4) permittedThrows += 1;
                 }
                 //random YUT throw
                 else{
                     int moveCount =(int)(Math.random() * 6);
                     permittedMoves.add(moveCount);
-                    if (moveCount == 4 || moveCount == 5) permittedThrows += 1;
+                    if (moveCount ==3 || moveCount == 4) permittedThrows += 1;
                 }
                 permittedThrows--;
             }  
@@ -75,9 +75,9 @@ public class Manager{
             boolean catchedOrGrouped = false;
             for (Player player : players){
                 for (Piece originalPiece : player.getPieces()){
-                    if (originalPiece.getPosition() == arrived_node){     
+                    if (originalPiece.getPosition() == arrived_node && (originalPiece != piece) ){     
                         // grouping - 비교하는 연산자가 맞음?   
-                        if (player == players[currentPlayer]){          
+                        if ( player == players[currentPlayer]){          
                             for (Piece lpiece:pieces){lpiece.setPosition(arrived_node);}
                             player.groupPieces(originalPiece,piece);
                             catchedOrGrouped = true;
@@ -99,7 +99,11 @@ public class Manager{
             
             if (!catchedOrGrouped) {
                 piece.setPosition(arrived_node);
-                if (piece.getStatus() == Piece.State.FINISHED) {for (Piece lpiece : pieces) {lpiece.setPosition(null);}}
+                if (piece.getStatus() == Piece.State.FINISHED) {
+                    for (Piece lpiece : pieces) {
+                        lpiece.setPosition(null);
+                    }
+                }
                 ui.mapUpdate(players);
             }
             permittedMoves.remove(Integer.valueOf(chosen_yut));
