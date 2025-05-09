@@ -309,9 +309,17 @@ public class UI implements View{
 				
 				piece[i][j].removeAll();
 				
+				Container parent=piece[i][j].getParent();
+				if(parent!=null) {
+					parent.removeAll();
+					parent.revalidate();
+					parent.repaint();
+				}
+				
 				switch(state) {
 				//말이 대기 상태인 겨우
 				case Piece.State.WAITING:
+					
 					piece[i][j].setLocation(piece_position[j][0],piece_position[j][1]);
 					player[i].add(piece[i][j]);
 					player[i].revalidate();
@@ -320,9 +328,11 @@ public class UI implements View{
 				//말이 맵 위에 있는 경우
 				case Piece.State.ON_BOARD:
 					position=pieces.get(j).getPosition();
+					
 					int on_d = map_node[position.id].getHeight();          // 노드 지름
+					
 					piece[i][j].setBounds((on_d-46)/2, (on_d-46)/2, 46, 46);
-					map_node[position.id].add(piece[i][j],BorderLayout.CENTER);
+					map_node[position.id].add(piece[i][j]);
 					map_node[position.id].revalidate();
 					map_node[position.id].repaint();
 					break;
@@ -330,24 +340,29 @@ public class UI implements View{
 				case Piece.State.OVERLAPPED:
 					position=pieces.get(j).getPosition();
 					//표시 되지 않는 말은 표시되지 않도록 설정
-					if(position==null) {
-						Container parent=piece[i][j].getParent();
-						if(parent!=null) {
-							parent.remove(piece[i][j]);
-							parent.revalidate();
-							parent.repaint();
-						}
+					if(position!=null) {
+						int count=pieces.get(j).getCount();//겹쳐진 말의 수
+						//겹쳐진 말의 수를 text로 표시
+						JLabel group_count=new JLabel(String.valueOf(count));
+						map_node[position.id].add(group_count);
+						group_count.setFont(new Font("SansSerif", Font.BOLD, 20));
+						group_count.setOpaque(false);
+						
+						int over_d = map_node[position.id].getHeight();          // 노드 지름
+						Dimension pref = group_count.getPreferredSize();
+						int cx = (over_d - pref.width)  / 2;
+						int cy = (over_d - pref.height) / 2;
+						group_count.setBounds(cx, cy, pref.width, pref.height);
+						piece[i][j].setBounds((over_d-46)/2, (over_d-46)/2, 46, 46);
+						map_node[position.id].add(piece[i][j]);
+						map_node[position.id].add(piece[i][j]);
+						map_node[position.id].setComponentZOrder(group_count, 0);
+						map_node[position.id].revalidate();
+						map_node[position.id].repaint();
+						
+						group_count.revalidate();
+						group_count.repaint();
 					}
-					int count=pieces.get(j).getCount();//겹쳐진 말의 수
-					//겹쳐진 말의 수를 text로 표시
-					JLabel group_count=new JLabel(String.valueOf(count));
-					piece[i][j].add(group_count);
-					int over_d = map_node[position.id].getHeight();          // 노드 지름
-					piece[i][j].setBounds((over_d-46)/2, (over_d-46)/2, 46, 46);
-					map_node[position.id].add(piece[i][j],BorderLayout.CENTER);
-					map_node[position.id].add(piece[i][j],BorderLayout.CENTER);
-					map_node[position.id].revalidate();
-					map_node[position.id].repaint();
 					break;
 					//말이 도착한 경우
 				case Piece.State.FINISHED:
@@ -489,6 +504,7 @@ public class UI implements View{
 					}
 	            });
 			  piece[turn][i].add(horse_button[i], BorderLayout.CENTER);
+			  
 			  piece[turn][i].revalidate();
 			  piece[turn][i].repaint();
 			  
