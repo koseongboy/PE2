@@ -57,15 +57,14 @@ public class Piece {
 	public ArrayList<Piece> getStackedPieces(){
 		ArrayList<Piece> result = new ArrayList<>();
 		ArrayList<Piece> pieces = owner.getPieces();
+		result.add(this);
 		for (Piece piece : pieces){
-			if (piece.getPosition() == this.getPosition()){
+			if (piece != this && piece.getStatus() == Piece.State.OVERLAPPED && piece.getPosition() == this.getPosition()){
 				result.add(piece);
 			}
 		}
 		return result;
 	}
-	public void copyFrom(){
 
-	}
 	
 }

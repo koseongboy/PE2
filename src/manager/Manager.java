@@ -3,7 +3,7 @@ package manager;
 import view.*;
 import model.*;
 
-import java.security.cert.PKIXReason;
+//import java.security.cert.PKIXReason;
 import java.util.ArrayList;
 
 
@@ -14,7 +14,6 @@ public class Manager{
     private View ui = new UI();
     private Board board;    
     private int currentPlayer = 0;
-    private Player[] players;
     private int permittedThrows = 1;
     private int[] arr = new int[6];
     private ArrayList<Integer> permittedMoves = new ArrayList<>();
@@ -26,28 +25,34 @@ public class Manager{
 
     public void runGame(){
         //setup map,users,pieces
-        System.err.println("test");
         int[] gameState = ui.gameSetup();
         int mapType = gameState[0];     //setup board
-        board = new Board(mapType);
+        
         int playerCount = gameState[1]; //setup 
         int pieceCount = gameState[2];
-        players = new Player[playerCount];
-        for (int i = 0; i < players.length; i++) {
-            players[i] = new Player(pieceCount);  
+
+        ArrayList<Player> players = new ArrayList<>();
+
+        for (int i =0 ;i<playerCount ; i++){
+            players.add(new Player(pieceCount));
         }
+        board = new Board(mapType,players);
+
 
         //game start : turn starts from 0Z
-        int finishedPlayers = 0 ;
-        while(finishedPlayers != playerCount-1){
-            
-            startTurn();
+        while(true){
+            int res = startTurn();
+            if (res>=0){
+                ui.gameEnd(res);
+                break;
+            };
             endTurn();          //finishing logic 추가
         }
+        
     }
 
     //한명의 턴을 진행
-    void startTurn() {
+    int startTurn() {
         while (permittedMoves.size() != 0 || permittedThrows !=0 ){
             while(permittedThrows != 0){
                 //deterministic YUT throw
@@ -71,70 +76,85 @@ public class Manager{
             //move piece as given amount
             //말 움직일떄 stack되어있는 말도 전부 움직이게 바꿔야함
             int piece_id = ui.choicePiece(currentPlayer);
-            Piece piece = players[currentPlayer].getPiece(piece_id);
-            ArrayList<Piece> pieces = piece.getStackedPieces();
+            ArrayList<Piece> pieces = board.players.get(currentPlayer).getPiece(piece_id).getStackedPieces();
 
             int chosen_yut;
             while(!permittedMoves.contains(chosen_yut = ui.choiceYut())){}
             permittedMoves.remove(Integer.valueOf(chosen_yut));
             arr[chosen_yut]--;
             ui.yutStateUpdate(arr);
-            Node arrived_node = board.followPath(pieces, chosen_yut);
+            if (board.followPath(pieces, chosen_yut)){
+                permittedThrows++;
+            }
+            ui.mapUpdate(board.players.toArray(new Player[0]));
 
+            //test for finish
+            {
+                int j = 0;
+                for (Piece wpiece : board.players.get(currentPlayer).getPieces()){
+                    if (wpiece.getStatus() == Piece.State.FINISHED){
+                        j++;
+                    }
+                }
+                if (j == board.players.get(currentPlayer).getPieces().size()){
+                    return board.players.indexOf(board.players.get(currentPlayer));
+                }
+            }   
             
 
             
-            boolean catchedOrGrouped = false;
-            for (Player player : players){
-                for (Piece destPiece : player.getPieces()){
-                    if (destPiece.getPosition() == arrived_node ){     
-                        // grouping - 비교하는 연산자가 맞음?   
-                        if ( player == players[currentPlayer]){          
-                            {
-                                for (Piece sourcePiece: pieces){
-                                    sourcePiece.setPosition(arrived_node);
-                                    sourcePiece.copyFrom(destPiece);
+            // boolean catchedOrGrouped = false;
+            // for (Player player : players){
+            //     for (Piece destPiece : player.getPieces()){
+            //         if (destPiece.getPosition() == arrived_node ){     
+            //             // grouping - 비교하는 연산자가 맞음?   
+            //             if ( player == players[currentPlayer]){          
+            //                 {
+            //                     for (Piece sourcePiece: pieces){
+            //                         sourcePiece.setPosition(arrived_node);
+            //                         sourcePiece.copyFrom(destPiece);
                                     
-                                }
-                            }
+            //                     }
+            //                 }
 
-                        }
-                        // catching
-                        else{                       
-                            piece.setPosition(arrived_node);
-                            if (piece.getStatus() == Piece.State.WAITING){
-                                piece.setStatus(Piece.State.ON_BOARD);
-                            }
-                            player.catchPiece(destPiece,piece);
-                            permittedThrows += 1;
-                        }
-                        catchedOrGrouped = true;
-                        ui.mapUpdate(players);
-                        break;
-                    }
-                }
-            }
+            //             }
+            //             // catching
+            //             else{                       
+            //                 piece.setPosition(arrived_node);
+            //                 if (piece.getStatus() == Piece.State.WAITING){
+            //                     piece.setStatus(Piece.State.ON_BOARD);
+            //                 }
+            //                 player.catchPiece(destPiece,piece);
+            //                 permittedThrows += 1;
+            //             }
+            //             catchedOrGrouped = true;
+            //             ui.mapUpdate(players);
+            //             break;
+            //         }
+            //     }
+            // }
             
-            if (!catchedOrGrouped && piece.getStatus() != Piece.State.FINISHED) {
-                piece.setPosition(arrived_node);
-                if (piece.getStatus() == Piece.State.WAITING){
-                    piece.setStatus(Piece.State.ON_BOARD);
-                }
-                if (piece.getStatus() == Piece.State.FINISHED) {
-                    for (Piece lpiece : pieces) {
-                        lpiece.setPosition(null);
-                        lpiece.setStatus(Piece.State.FINISHED);
-                    }
-                }
+            // if (!catchedOrGrouped && piece.getStatus() != Piece.State.FINISHED) {
+            //     piece.setPosition(arrived_node);
+            //     if (piece.getStatus() == Piece.State.WAITING){
+            //         piece.setStatus(Piece.State.ON_BOARD);
+            //     }
+            //     if (piece.getStatus() == Piece.State.FINISHED) {
+            //         for (Piece lpiece : pieces) {
+            //             lpiece.setPosition(null);
+            //             lpiece.setStatus(Piece.State.FINISHED);
+            //         }
+            //     }
                 
-            }
-            ui.mapUpdate(players);
+            // }
+            
             
         }
+        return -1;
     }
 
     private void endTurn() { 
-        currentPlayer = (currentPlayer + 1) % players.length; 
+        currentPlayer = (currentPlayer + 1) % board.players.size(); 
         permittedThrows = 1;
         arr = new int[6];
         ui.yutStateUpdate(arr);

@@ -167,15 +167,6 @@ public class UI implements View{
             int d = node_location[i][2];
             CircleLayeredPane node = new CircleLayeredPane(d);
             node.setBounds(node_location[i][0], node_location[i][1], d, d);
-
-            // ① 겹침 라벨을 미리 높은 레이어에 올려둔다
-            JLabel lbl = new JLabel("", SwingConstants.CENTER);
-            lbl.setFont(new Font("SansSerif", Font.BOLD, 20));
-            Dimension ps = lbl.getPreferredSize();
-            lbl.setBounds((d-ps.width)/2, (d-ps.height)/2, ps.width, ps.height);
-            node.add(lbl, JLayeredPane.PALETTE_LAYER);          // PALETTE_LAYER = 100
-            node.putClientProperty("countLabel", lbl);
-
             map.add(node);
             map_node[i] = node;
         }
@@ -306,10 +297,8 @@ public class UI implements View{
 		int[][] piece_position= {{33,30},{112,30},{191,30},
 	        						 {33,112},{112,112}};
 		
-		//각 player의 말 읽어들이기
 		for(int i=0;i<players.length;i++) {
 			ArrayList<Piece> pieces=players[i].getPieces();
-			
 			for(int j=0;j<pieces.size();j++) {
 				
 				piece[i][j].removeAll();
@@ -321,6 +310,18 @@ public class UI implements View{
 					parent.repaint();
 				}
 			}
+		}
+		
+		for(int i=0;i<player.length;i++) {
+			player[i].add(turn_label[i]);
+			turn_label[i].setBounds(109, 5, 100, 15);
+			player[i].revalidate();
+			player[i].repaint();
+		}
+		
+		//각 player의 말 읽어들이기
+		for(int i=0;i<players.length;i++) {
+			ArrayList<Piece> pieces=players[i].getPieces();
 			
 			//말 배열 loop 문
 			for(int j=0;j<pieces.size();j++) {
@@ -339,23 +340,22 @@ public class UI implements View{
 				//말이 맵 위에 있는 경우
 				case Piece.State.ON_BOARD:
 					position=pieces.get(j).getPosition();
-					
+
 					int on_d = map_node[position.id].getHeight();          // 노드 지름
 					
 					piece[i][j].setBounds((on_d-46)/2, (on_d-46)/2, 46, 46);
-					map_node[position.id].add(piece[i][j], JLayeredPane.DEFAULT_LAYER);
+					map_node[position.id].add(piece[i][j]);
 					map_node[position.id].revalidate();
 					map_node[position.id].repaint();
-					
 					break;
 				//말이 겹쳐진 경우->하나의 말만 표시
 				case Piece.State.OVERLAPPED:
 					position=pieces.get(j).getPosition();
 					//표시 되지 않는 말은 표시되지 않도록 설정
-					if(position!=null) {
-						int count=pieces.get(j).getCount();//겹쳐진 말의 수
-						//겹쳐진 말의 수를 text로 표시
-						JLabel group_count=new JLabel(String.valueOf(count));
+					int count=pieces.get(j).getCount();//겹쳐진 말의 수
+					//겹쳐진 말의 수를 text로 표시
+					JLabel group_count=new JLabel(String.valueOf(count));
+					if(map_node[position.id].getComponentCount()==0) {
 						map_node[position.id].add(group_count, JLayeredPane.PALETTE_LAYER);
 						group_count.setFont(new Font("SansSerif", Font.BOLD, 20));
 						group_count.setOpaque(false);
@@ -373,6 +373,7 @@ public class UI implements View{
 						group_count.revalidate();
 						group_count.repaint();
 					}
+					
 					break;
 					//말이 도착한 경우
 				case Piece.State.FINISHED:
@@ -389,6 +390,7 @@ public class UI implements View{
 				piece[i][j].repaint();
 				
 			}
+			
 		}
 	}
 	  
@@ -513,11 +515,11 @@ public class UI implements View{
 						e1.printStackTrace();
 					}
 	            });
-			  
-			  piece[turn][i].add(horse_button[i], BorderLayout.CENTER);
-			  
-			  piece[turn][i].revalidate();
-			  piece[turn][i].repaint();
+			  if(piece[turn][i].getComponentCount()==0) {
+				  piece[turn][i].add(horse_button[i], BorderLayout.CENTER);
+				  piece[turn][i].revalidate();
+				  piece[turn][i].repaint();
+			  }
 			  
 		  }
 		  
@@ -616,6 +618,20 @@ public class UI implements View{
 		  }
 	  }
 	  
+	  public void gameEnd(int player) {
+		    // 1) 다이얼로그를 frame을 부모로 해서 띄우기
+		    String message = "Player " + (player + 1) + " is Winner!";
+		    JOptionPane.showMessageDialog(
+		        frame,                         // 부모 컴포넌트로 frame 지정
+		        message,                       // 표시할 텍스트
+		        "Game End",                    // 다이얼로그 타이틀
+		        JOptionPane.INFORMATION_MESSAGE
+		    );
+		    
+		    // 2) 다이얼로그가 닫힌 뒤에 frame도 종료
+		    frame.dispose();
+		}
+	  
 	//원 모양 패널을 만들기 위한 class
 	  public class CircleLayeredPane extends JLayeredPane {
 		    private final int diameter;
@@ -634,12 +650,6 @@ public class UI implements View{
 		        g.setColor(getBackground());
 		        g.fillOval(0, 0, diameter, diameter);
 		    }
-		}
-	  
-	//   public static void main(String[] args) {
-	// 	  View a=new UI();
-	// 	  a.gameSetup();
-	//   }
-	  
+		}	  
 		  
 }

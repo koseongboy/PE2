@@ -1,5 +1,5 @@
 package model;
-import java.nio.channels.Pipe.SourceChannel;
+//import java.nio.channels.Pipe.SourceChannel;
 import java.util.*;
 
 
@@ -148,7 +148,7 @@ public class Board {
         ArrayList<Piece> result = new ArrayList<>();
         for (Player player : players){
             for (Piece piece : player.getPieces()){
-                if (position.id == piece.getPosition().id){
+                if ( piece.getStatus() == Piece.State.ON_BOARD && position == piece.getPosition()) {
                     result.add(piece);
                 }
             }
@@ -158,6 +158,7 @@ public class Board {
 
 
     // ----------------------- false == 한번 더 기회 안줘도 됨 / true == 한번 더 기회 줘야함(caught)
+    @SuppressWarnings("unchecked")
     public Boolean followPath(ArrayList<Piece> sourcePieces, int steps) {
 
         boolean result = false;
@@ -271,6 +272,7 @@ public class Board {
                             destPiece.setStatus(Piece.State.WAITING);
                             destPiece.setCount(1);
                         }
+                        result = true;
                     }
                 }
             }
@@ -321,7 +323,7 @@ public class Board {
 
                             // dest 피스들
                             for (Piece destPiece : destPieces){
-                                destPiece.path = sourcePieces.get(0).path;
+                                destPiece.path = (ArrayList<Node>) sourcePieces.get(0).path.clone();
                                 destPiece.setStatus(Piece.State.OVERLAPPED);
                                 destPiece.setCount(count);
                             }
@@ -343,6 +345,7 @@ public class Board {
                                 destPiece.setStatus(Piece.State.WAITING);
                                 destPiece.setCount(1);
                             }
+                            result = true;
                         }
                     }
                 }
@@ -351,44 +354,86 @@ public class Board {
             // 정상적인 윳 나옴
             else{
 
+                // 마지막 목적지 노드와 해당 경로를 미리 계산
+                Node destNode = sourcePieces.get(0).path.getLast();
+                ArrayList<Node> tempPath = new ArrayList<>();
+                tempPath.add(destNode);
+                for (int i = -1 ; i<steps ; i++){
+                    if ( (i == -1 && destNode.warp != null) ||  ( (type == 4 && destNode.id == 26) && tempPath.get(tempPath.size() - 2).id == 26 )) {
+                        destNode = destNode.warp; // enter diagonal
+                        tempPath.add(destNode);
+                    }
+                    else {
+                        destNode = destNode.next;
+                        tempPath.add(destNode);
+                    }
 
-                
-            }
-
-
-
-
-        }
-        else {
-            cur = sourcePieces.get(0).getPosition();
-        }
-        if (steps == 5){
-            if (sourcePieces.get(0).aboutToFinish == false){
-                return cur;
-            }
-            cur = cur.before;
-        }else{        
-            for (int i = -1; i < steps; i++) {
-                if (i == -1 && cur.warp != null || (type==4 && (cur.before != null) && cur.before.id == 26) ) {
-                    Node temp = cur;
-                    cur = cur.warp; // enter diagonal
-                    for (Piece piece : sourcePieces){
-                        piece.path.add(temp);
+                    // 처음 말을 움직이는게 아닌 상황에서, 말이 1로 이동할 경우 완주
+                    if (destNode == start.next){
+                        for (Piece sourcePiece : sourcePieces){
+                            sourcePiece.setPosition(null);
+                            sourcePiece.path.clear();
+                            sourcePiece.setStatus(Piece.State.FINISHED);
+                            sourcePiece.setCount(1);
+                        }
+                        return result;
                     }
                 }
-                else {
-                    Node temp = cur;        
-                    cur = cur.next;
-                    for (Piece piece : sourcePieces){
-                        piece.path.add(temp);
+
+                ArrayList<Piece> destPieces = getStackedPieces(destNode);
+                // 마지막 목적지 노드가 비어있는 경우
+                if (destPieces.isEmpty()){
+
+                    for (Piece sourcePiece : sourcePieces){
+                        sourcePiece.setPosition(destNode);
+                        sourcePiece.path.addAll(tempPath);
                     }
                 }
-                if()
-                
-            }
 
+                // 마지막 목적지 노드가 안 비워져 잇는 경우
+                else{
+
+                    // grouping
+                    if(destPieces.get(0).getOwner() == sourcePieces.get(0).getOwner()){
+                        int count = sourcePieces.size() + destPieces.size();
+
+                        // source 피스들
+                        for (Piece sourcePiece : sourcePieces){
+                            sourcePiece.setPosition(destNode);
+                            sourcePiece.path.addAll(tempPath);
+                            sourcePiece.setStatus(Piece.State.OVERLAPPED);
+                            sourcePiece.setCount(count);
+                        }
+
+                        // dest 피스들
+                        for (Piece destPiece : destPieces){
+                            destPiece.path = (ArrayList<Node>) sourcePieces.get(0).path.clone();
+                            destPiece.setStatus(Piece.State.OVERLAPPED);
+                            destPiece.setCount(count);
+                        }
+                    }
+
+                    // catching
+                    else{
+                        // source 피스들
+                        for (Piece sourcePiece : sourcePieces){
+                            sourcePiece.setPosition(destNode);
+                            sourcePiece.path.addAll(tempPath);
+                        }
+
+                        // dest 피스들
+                        for (Piece destPiece : destPieces){
+                            destPiece.setPosition(null);
+                            destPiece.path.clear();
+                            destPiece.setStatus(Piece.State.WAITING);
+                            destPiece.setCount(1);
+                        }
+                        result = true;
+                    }
+                }
+            }
         }
-        return cur;
+        return result;
     }
         
 }
