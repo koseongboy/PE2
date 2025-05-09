@@ -610,11 +610,6 @@ public class UI implements View{
 		    }
 		}
 	  
-	  public static void main(String[] args) {
-		  View a=new UI();
-		  a.gameSetup();
-	  }
-	  
 		  
 }
 
