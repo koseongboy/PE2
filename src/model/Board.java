@@ -58,6 +58,8 @@ public class Board {
 
             n[5].warp = n[28];
             //
+            n[29].next = n[27];
+            
             n[27].next = n[35];
             n[35].next = n[34];
             n[34].next = n[20];
@@ -143,13 +145,15 @@ public class Board {
     // ---------- public API ---------------------------------------------------
     /** Follows regular or diagonal path depending on warp entry squares. */
     public Node followPath(ArrayList<Piece> pieces, int steps) {
+        Node cur;
         if (pieces.get(0).getStatus() == Piece.State.WAITING){
-            pieces.get(0).setPosition(Board.start);
-            pieces.get(0).setStatus(Piece.State.ON_BOARD);
+            cur = Board.start;
         }
-        Node cur = pieces.get(0).getPosition();
+        else {
+            cur = pieces.get(0).getPosition();
+        }
         if (steps == 5){
-            if (cur.before == null){
+            if (pieces.get(0).aboutToFinish == false){
                 return cur;
             }
             cur = cur.before;
@@ -170,6 +174,7 @@ public class Board {
                 }
                 if (pieces.get(0).aboutToFinish && (cur == start.next)){
                     for (Piece piece : pieces){piece.setStatus(Piece.State.FINISHED);}
+                    break;
                 }
                 
             }

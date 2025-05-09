@@ -23,7 +23,7 @@ public class UI implements View{
 	JPanel[] player;	//플레이어 패널 저장 배열
 	JLabel[] turn_label;//플레이어 패널 영역에 있는 "your turn" 라벨 배열
 	JPanel[][] piece;	//플레이어 수 X 말의 수 shape의 말 패널 배열
-	JPanel[] map_node;		//맵의 노드 패널 배열
+	JLayeredPane[] map_node;		//맵의 노드 패널 배열
 	
 	JLabel[] yut_state_image;//오른쪽 위의 윷 이미지
 	JLabel[] yut_state_text;//오른쪽 위 윷 텍스트
@@ -161,15 +161,23 @@ public class UI implements View{
         	map_len=43;
         }
         
-        map_node=new CirclePanel[map_len];
+        map_node=new CircleLayeredPane[map_len];
         //맵의 각 노드에 패널 설정
-        for(int i=0;i<map_len;i++) {
-        	map_node[i]=new CirclePanel(node_location[i][2]);
-        	map_node[i].setBounds(node_location[i][0],node_location[i][1], node_location[i][2],node_location[i][2]);
-        	map_node[i].setLayout(new GridBagLayout());
-        	map_node[i].setOpaque(false);
-		  	map.add(map_node[i]);
-        	
+        for (int i = 0; i < map_len; i++) {
+            int d = node_location[i][2];
+            CircleLayeredPane node = new CircleLayeredPane(d);
+            node.setBounds(node_location[i][0], node_location[i][1], d, d);
+
+            // ① 겹침 라벨을 미리 높은 레이어에 올려둔다
+            JLabel lbl = new JLabel("", SwingConstants.CENTER);
+            lbl.setFont(new Font("SansSerif", Font.BOLD, 20));
+            Dimension ps = lbl.getPreferredSize();
+            lbl.setBounds((d-ps.width)/2, (d-ps.height)/2, ps.width, ps.height);
+            node.add(lbl, JLayeredPane.PALETTE_LAYER);          // PALETTE_LAYER = 100
+            node.putClientProperty("countLabel", lbl);
+
+            map.add(node);
+            map_node[i] = node;
         }
         
         //맵 이미지를 화면에 full되도록 설정
@@ -265,14 +273,14 @@ public class UI implements View{
 		for(int i = 0 ; i<6 ; i++) {
 			yut_state_image[i] = new JLabel();
 		}
-		/*
+		
 		int[][] yut_state_loc = new int[][]{{32,44,72,99},{176, 44, 72, 99},{320, 44, 72, 99},{32, 207, 72, 99},{176, 207, 72, 99},{320, 207, 72, 99}};
 		for(int i = 0 ; i<6 ; i++) {
 			yut_state_image[i].setIcon(new ImageIcon(UI.class.getResource("/images/"+yutUrl[i]+".png")));
 			yut_state_image[i].setBounds(yut_state_loc[i][0],yut_state_loc[i][1],yut_state_loc[i][2],yut_state_loc[i][3]);
 			yut_state.add(yut_state_image[i]);
 		}
-        */
+        
 		
 		yut_state_text = new JLabel[6];
 		for(int i = 0 ; i<6 ; i++) {
@@ -302,39 +310,69 @@ public class UI implements View{
 		for(int i=0;i<players.length;i++) {
 			ArrayList<Piece> pieces=players[i].getPieces();
 			
+			for(int j=0;j<pieces.size();j++) {
+				
+				piece[i][j].removeAll();
+				
+				Container parent=piece[i][j].getParent();
+				if(parent!=null) {
+					parent.removeAll();
+					parent.revalidate();
+					parent.repaint();
+				}
+			}
+			
 			//말 배열 loop 문
 			for(int j=0;j<pieces.size();j++) {
 				Piece.State state=pieces.get(j).getStatus();
 				Node position;
 				
-				piece[i][j].removeAll();
-				
 				switch(state) {
 				//말이 대기 상태인 겨우
 				case Piece.State.WAITING:
+					
 					piece[i][j].setLocation(piece_position[j][0],piece_position[j][1]);
 					player[i].add(piece[i][j]);
+					player[i].revalidate();
+					player[i].repaint();
 					break;
 				//말이 맵 위에 있는 경우
 				case Piece.State.ON_BOARD:
 					position=pieces.get(j).getPosition();
-					map_node[position.id].add(piece[i][j]);
+					
+					int on_d = map_node[position.id].getHeight();          // 노드 지름
+					
+					piece[i][j].setBounds((on_d-46)/2, (on_d-46)/2, 46, 46);
+					map_node[position.id].add(piece[i][j], JLayeredPane.DEFAULT_LAYER);
+					map_node[position.id].revalidate();
+					map_node[position.id].repaint();
+					
 					break;
 				//말이 겹쳐진 경우->하나의 말만 표시
 				case Piece.State.OVERLAPPED:
 					position=pieces.get(j).getPosition();
 					//표시 되지 않는 말은 표시되지 않도록 설정
-					if(position==null) {
-						Container parent=piece[i][j].getParent();
-						if(parent!=null) {
-							parent.remove(piece[i][j]);
-						}
+					if(position!=null) {
+						int count=pieces.get(j).getCount();//겹쳐진 말의 수
+						//겹쳐진 말의 수를 text로 표시
+						JLabel group_count=new JLabel(String.valueOf(count));
+						map_node[position.id].add(group_count, JLayeredPane.PALETTE_LAYER);
+						group_count.setFont(new Font("SansSerif", Font.BOLD, 20));
+						group_count.setOpaque(false);
+						
+						int over_d = map_node[position.id].getHeight();          // 노드 지름
+						Dimension pref = group_count.getPreferredSize();
+						int cx = (over_d - pref.width)  / 2;
+						int cy = (over_d - pref.height) / 2;
+						group_count.setBounds(cx, cy, pref.width, pref.height);
+						piece[i][j].setBounds((over_d-46)/2, (over_d-46)/2, 46, 46);
+						map_node[position.id].add(piece[i][j], JLayeredPane.DEFAULT_LAYER);
+						map_node[position.id].revalidate();
+						map_node[position.id].repaint();
+						
+						group_count.revalidate();
+						group_count.repaint();
 					}
-					int count=pieces.get(j).getCount();//겹쳐진 말의 수
-					//겹쳐진 말의 수를 text로 표시
-					JLabel group_count=new JLabel(String.valueOf(count));
-					piece[i][j].add(group_count);
-					map_node[position.id].add(piece[i][j]);
 					break;
 					//말이 도착한 경우
 				case Piece.State.FINISHED:
@@ -344,7 +382,12 @@ public class UI implements View{
 					piece[i][j].setEnabled(false);
 					JLabel complete=new JLabel("도착");
 					piece[i][j].add(complete);
+					player[i].revalidate();
+					player[i].repaint();
 				}
+				piece[i][j].revalidate();
+				piece[i][j].repaint();
+				
 			}
 		}
 	}
@@ -470,7 +513,9 @@ public class UI implements View{
 						e1.printStackTrace();
 					}
 	            });
+			  
 			  piece[turn][i].add(horse_button[i], BorderLayout.CENTER);
+			  
 			  piece[turn][i].revalidate();
 			  piece[turn][i].repaint();
 			  
@@ -572,42 +617,22 @@ public class UI implements View{
 	  }
 	  
 	//원 모양 패널을 만들기 위한 class
-	  public class CirclePanel extends JPanel {
-		  //원 패널의 지름
+	  public class CircleLayeredPane extends JLayeredPane {
 		    private final int diameter;
-
-		    public CirclePanel(int diameter) {
+		    public CircleLayeredPane(int diameter) {
 		        this.diameter = diameter;
-		        setOpaque(false); // 배경은 투명
+		        setOpaque(false);
+		        // 배경색을 알파=0 으로 설정해 완전 투명 처리
+		        setBackground(new Color(0, 0, 0, 0));
 		        setPreferredSize(new Dimension(diameter, diameter));
-		        setBackground(new Color(0, 0, 0, 0)); // 기본 원 색 (투명)
+		        setLayout(null);
 		    }
-
 		    @Override
 		    protected void paintComponent(Graphics g) {
-		        //배경 처리
 		        super.paintComponent(g);
-
-		        Graphics2D g2 = (Graphics2D) g.create();
-		        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-		                            RenderingHints.VALUE_ANTIALIAS_ON);
-
-		        // 중심 좌표 기준으로 정사각형 내에 원 그리기
-		        g2.setColor(getBackground()); // 배경색 → 원 색으로 사용
-		        g2.fillOval(0, 0, diameter, diameter);
-
-		        g2.dispose();
-		    }
-
-		    /**
-		     * 마우스 이벤트 처리 범위를 원 내부로 제한
-		     */
-		    @Override
-		    public boolean contains(int x, int y) {
-		        int radius = diameter / 2;
-		        int dx = x - radius;
-		        int dy = y - radius;
-		        return dx * dx + dy * dy <= radius * radius;
+		        // 배경색이 투명으로 설정되어 있으므로 이 채우기는 화면에 아무것도 그리지 않습니다.
+		        g.setColor(getBackground());
+		        g.fillOval(0, 0, diameter, diameter);
 		    }
 		}
 	  

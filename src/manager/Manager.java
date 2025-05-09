@@ -1,7 +1,9 @@
+//grouping 된 애들이 들어왔을때 제대로 동작하는지 체크 - setPosition 과 setStatus 가 동시에 일어나는지 체크해야함
 package manager;
 import view.*;
 import model.*;
 
+import java.security.cert.PKIXReason;
 import java.util.ArrayList;
 
 
@@ -14,6 +16,7 @@ public class Manager{
     private int currentPlayer = 0;
     private Player[] players;
     private int permittedThrows = 1;
+    private int[] arr = new int[6];
     private ArrayList<Integer> permittedMoves = new ArrayList<>();
     
     public static void main(String[] args) {
@@ -51,15 +54,18 @@ public class Manager{
                 if (ui.throwing() == true) {
                     int moveCount = ui.choiceYut();
                     permittedMoves.add(moveCount);
+                    arr[moveCount]++;
                     if (moveCount == 3 || moveCount == 4) permittedThrows += 1;
                 }
                 //random YUT throw
                 else{
                     int moveCount =(int)(Math.random() * 6);
                     permittedMoves.add(moveCount);
+                    arr[moveCount]++;
                     if (moveCount ==3 || moveCount == 4) permittedThrows += 1;
                 }
                 permittedThrows--;
+                ui.yutStateUpdate(arr);
             }  
             
             //move piece as given amount
@@ -70,50 +76,58 @@ public class Manager{
 
             int chosen_yut;
             while(!permittedMoves.contains(chosen_yut = ui.choiceYut())){}
-
+            permittedMoves.remove(Integer.valueOf(chosen_yut));
+            arr[chosen_yut]--;
+            ui.yutStateUpdate(arr);
             Node arrived_node = board.followPath(pieces, chosen_yut);
             
             boolean catchedOrGrouped = false;
             for (Player player : players){
                 for (Piece originalPiece : player.getPieces()){
-                    if (originalPiece.getPosition() == arrived_node && (originalPiece != piece) ){     
+                    if ((originalPiece != piece) && originalPiece.getPosition() == arrived_node ){     
                         // grouping - 비교하는 연산자가 맞음?   
                         if ( player == players[currentPlayer]){          
-                            for (Piece lpiece:pieces){lpiece.setPosition(arrived_node);}
+                            for (Piece lpiece:pieces){
+                                lpiece.setPosition(arrived_node);
+                                lpiece.setStatus(Piece.State.ON_BOARD);
+                            }
                             player.groupPieces(originalPiece,piece);
-                            catchedOrGrouped = true;
-                            ui.mapUpdate(players);
-                            break;
+
                         }
                         // catching
                         else{                       
                             piece.setPosition(arrived_node);
+                            piece.setStatus(Piece.State.ON_BOARD);
                             player.catchPiece(originalPiece,piece);
                             permittedThrows += 1;
-                            catchedOrGrouped = true;
-                            ui.mapUpdate(players);
-                            break;
                         }
+                        catchedOrGrouped = true;
+                        ui.mapUpdate(players);
+                        break;
                     }
                 }
             }
             
             if (!catchedOrGrouped) {
                 piece.setPosition(arrived_node);
+                piece.setStatus(Piece.State.ON_BOARD);
                 if (piece.getStatus() == Piece.State.FINISHED) {
                     for (Piece lpiece : pieces) {
                         lpiece.setPosition(null);
+                        lpiece.setStatus(Piece.State.FINISHED);
                     }
                 }
                 ui.mapUpdate(players);
             }
-            permittedMoves.remove(Integer.valueOf(chosen_yut));
+            
         }
     }
 
     private void endTurn() { 
         currentPlayer = (currentPlayer + 1) % players.length; 
         permittedThrows = 1;
+        arr = new int[6];
+        ui.yutStateUpdate(arr);
         permittedMoves = new ArrayList<>();
         ui.turnChange(currentPlayer);
     }
