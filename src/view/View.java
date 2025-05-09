@@ -24,7 +24,5 @@ public interface View {
 	  public int end(int winner);
 	  //player 0~3
 	  public void turnChange(int turn);
-	  //몇 번 플레이어가 이겼는지 출력(0~3 입력)
-	  public void gameEnd(int player);
 	  
 }

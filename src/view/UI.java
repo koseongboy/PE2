@@ -328,6 +328,7 @@ public class UI implements View{
 				Piece.State state=pieces.get(j).getStatus();
 				Node position;
 				
+				System.out.println(state);
 				switch(state) {
 				//말이 대기 상태인 겨우
 				case Piece.State.WAITING:
@@ -353,6 +354,7 @@ public class UI implements View{
 					position=pieces.get(j).getPosition();
 					//표시 되지 않는 말은 표시되지 않도록 설정
 					int count=pieces.get(j).getCount();//겹쳐진 말의 수
+					System.out.println(count);
 					//겹쳐진 말의 수를 text로 표시
 					JLabel group_count=new JLabel(String.valueOf(count));
 					if(map_node[position.id].getComponentCount()==0) {
@@ -390,7 +392,7 @@ public class UI implements View{
 				piece[i][j].repaint();
 				
 			}
-			
+				
 		}
 	}
 	  
@@ -526,9 +528,11 @@ public class UI implements View{
 			 try {
 		        	output = clickQueue.take();
 		        	for(int i = 0 ;i<piece[0].length; i++) {
-		        		piece[turn][i].removeAll();
-		        		piece[turn][i].revalidate();
-		        		piece[turn][i].repaint();
+		        		if(piece[turn][i].isEnabled()) {
+		        			piece[turn][i].removeAll();
+			        		piece[turn][i].revalidate();
+			        		piece[turn][i].repaint();
+		        		}
 		        	}
 
 		            // 버튼 클릭까지 대기
@@ -618,19 +622,6 @@ public class UI implements View{
 		  }
 	  }
 	  
-	  public void gameEnd(int player) {
-		    // 1) 다이얼로그를 frame을 부모로 해서 띄우기
-		    String message = "Player " + (player + 1) + " is Winner!";
-		    JOptionPane.showMessageDialog(
-		        frame,                         // 부모 컴포넌트로 frame 지정
-		        message,                       // 표시할 텍스트
-		        "Game End",                    // 다이얼로그 타이틀
-		        JOptionPane.INFORMATION_MESSAGE
-		    );
-		    
-		    // 2) 다이얼로그가 닫힌 뒤에 frame도 종료
-		    frame.dispose();
-		}
 	  
 	//원 모양 패널을 만들기 위한 class
 	  public class CircleLayeredPane extends JLayeredPane {
