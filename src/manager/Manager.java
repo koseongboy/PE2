@@ -19,38 +19,41 @@ public class Manager{
     private ArrayList<Integer> permittedMoves = new ArrayList<>();
     
     public static void main(String[] args) {
-        Manager manager = new Manager();  
-        manager.runGame();                
-    }
 
-    public void runGame(){
         int replay = 1;
         while (replay == 1){
-            //setup map,users,pieces
-            int[] gameState = ui.gameSetup();
-            int mapType = gameState[0];     //setup board
-            
-            int playerCount = gameState[1]; //setup 
-            int pieceCount = gameState[2];
+            Manager manager = new Manager();  
+            replay = manager.runGame();    
+        }            
+    }
 
-            ArrayList<Player> players = new ArrayList<>();
+    public int runGame(){
 
-            for (int i =0 ;i<playerCount ; i++){
-                players.add(new Player(pieceCount));
-            }
-            board = new Board(mapType,players);
+        //setup map,users,pieces
+        int[] gameState = ui.gameSetup();
+        int mapType = gameState[0];     //setup board
+        
+        int playerCount = gameState[1]; //setup 
+        int pieceCount = gameState[2];
 
-            //game start : turn starts from 0Z        
-            while(true){
-                int res = startTurn();
-                if (res>=0){
-                    replay = ui.end(res);
-                    break;
-                };
-                endTurn();          //finishing logic 추가
-            }
-            ui = new UI();
+        ArrayList<Player> players = new ArrayList<>();
+
+        for (int i =0 ;i<playerCount ; i++){
+            players.add(new Player(pieceCount));
         }
+        board = new Board(mapType,players);
+
+        int replay;
+        //game start : turn starts from 0Z        
+        while(true){
+            int res = startTurn();
+            if (res>=0){
+                replay = ui.end(res);
+                break;
+            };
+            endTurn();          //finishing logic 추가
+        }
+        return replay;
         
     }
 
