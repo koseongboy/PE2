@@ -328,7 +328,6 @@ public class UI implements View{
 				Piece.State state=pieces.get(j).getStatus();
 				Node position;
 				
-				System.out.println(state);
 				switch(state) {
 				//말이 대기 상태인 겨우
 				case Piece.State.WAITING:
@@ -354,7 +353,6 @@ public class UI implements View{
 					position=pieces.get(j).getPosition();
 					//표시 되지 않는 말은 표시되지 않도록 설정
 					int count=pieces.get(j).getCount();//겹쳐진 말의 수
-					System.out.println(count);
 					//겹쳐진 말의 수를 text로 표시
 					JLabel group_count=new JLabel(String.valueOf(count));
 					if(map_node[position.id].getComponentCount()==0) {

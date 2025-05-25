@@ -332,9 +332,9 @@ public class Board {
                 // 마지막 목적지 노드와 해당 경로를 미리 계산
                 Node destNode = sourcePieces.get(0).path.getLast();
                 ArrayList<Node> tempPath = new ArrayList<>();
-                tempPath.add(destNode);
+                //tempPath.add(destNode);
                 for (int i = -1 ; i<steps ; i++){
-                    if ( (i == -1 && destNode.warp != null) ||  ( (type == 4 && destNode.id == 26) && tempPath.get(tempPath.size() - 2).id == 26 )) {
+                    if ( (i == -1 && destNode.warp != null) ||  ( (type == 4 && destNode.id == 22) && tempPath.get(tempPath.size() - 2).id == 26 )) {
                         destNode = destNode.warp; // enter diagonal
                         tempPath.add(destNode);
                     }
