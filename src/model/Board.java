@@ -49,7 +49,7 @@ public class Board {
 
  
         } else if (type == 5) {
-            Node[] n = new Node[36];
+            n = new Node[36];
             for (int i = 0; i < n.length; i++) n[i] = new Node(i);
             start = n[0];
 
@@ -82,7 +82,7 @@ public class Board {
 
             
         } else if (type == 6) {
-            Node[] n = new Node[43];
+            n = new Node[43];
             for (int i = 0; i < n.length; i++) n[i] = new Node(i);
 
             // Regular outer track (counter‑clockwise)
@@ -118,6 +118,9 @@ public class Board {
     }
 
 
+    public Node getNode(int idx) {
+        return this.n[idx];
+    }
 
     public ArrayList<Piece> getStackedPieces(Node position){
         ArrayList<Piece> result = new ArrayList<>();
@@ -130,6 +133,8 @@ public class Board {
         }
         return result;
     }
+
+
 
 
     // ----------------------- false == 한번 더 기회 안줘도 됨 / true == 한번 더 기회 줘야함(caught)
