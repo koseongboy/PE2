@@ -1,4 +1,6 @@
 {
   "java.project.sourcePaths": ["src"],
-  "java.project.referencedLibraries": []
+  "java.project.referencedLibraries": [
+    "c:\\Users\\koseonghyeon\\Downloads\\junit-platform-console-standalone-1.8.2.jar"
+  ]
 }
