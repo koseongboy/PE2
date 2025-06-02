@@ -458,8 +458,12 @@ public class UI implements View {
                             piece[i][j].setDisable(true);
                             
                             Label complete = new Label("도착");
+                            complete.setFont(Font.font("맑은 고딕", FontWeight.BOLD, 20));
                             complete.setAlignment(Pos.CENTER);
-                            piece[i][j].getChildren().add(complete);
+                            StackPane wrapper = new StackPane(complete);
+                            wrapper.setPrefSize(piece[i][j].getPrefWidth(), piece[i][j].getPrefHeight());
+                            piece[i][j].getChildren().add(wrapper);
+                          
                             ((Pane)player[i].getChildren().get(0)).getChildren().add(piece[i][j]);
                             break;
                     }
@@ -577,6 +581,15 @@ public class UI implements View {
                 horse_button.setStyle("-fx-background-color: transparent;");
                 horse_button.setPrefSize(46, 46);
                 horse_button.setOnAction(e -> future.complete(index));
+                
+                horse_button.setStyle("""
+                        -fx-background-color: rgba(255,215,0,0.35);  /* 살짝 노란 반투명 */
+                        -fx-border-color: #ffd700;                   /* 황금색 테두리 */
+                        -fx-border-width: 2;
+                        -fx-border-radius: 6;
+                        -fx-background-radius: 6;
+                        -fx-cursor: hand;                            /* 손 모양 커서 */
+                        """);
                 
                 if(piece[turn][i].getChildren().isEmpty()) {
                     piece[turn][i].getChildren().add(horse_button);
